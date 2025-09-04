@@ -8,5 +8,7 @@ Besides coding, here are some other things I enjoy doing:
 
 ![picture of my cute dog Friday](assets/friday.jpg)
 
+I really look forward to 6.1040, and hope to build some cool projects during this class (yay!)
+
 # Table of Contents
 [Link to Assignment 1](assignments/assignment1.md)
