@@ -18,11 +18,25 @@
 	- [Impulse purchases and inconvenient expense tracking](#impulse-purchases-and-inconvenient-expense-tracking)
 	- [Food sensitivities and body reactions](#food-sensitivities-and-body-reactions)
 	- [Over-ambitious scheduling that does not match reality](#over-ambitious-scheduling-that-does-not-match-reality)
+4. [Evidence and Comparable](#evidence-and-comparable)
+	- [Impulse purchases and inconvenient expense tracking](#impulse-purchases-and-inconvenient-expense-tracking)
+		- [Evidence](#evidence)
+		- [Comparables](#comparables)
+	- [Food sensitivities and body reactions](#food-sensitivities-and-body-reactions)
+		- [Evidence](#evidence)
+		- [Comparables](#comparables)
+	- [Over-ambitious scheduling that does not match reality](#over-ambitious-scheduling-that-does-not-match-reality)
+		- [Evidence](#evidence)
+		- [Comparables](#comparables)
+5. [Features](#features)
+	- [Impulse purchases and inconvenient expense tracking](#impulse-purchases-and-inconvenient-expense-tracking)
+	- [Food sensitivities and body reactions](#food-sensitivities-and-body-reactions)
+	- [Over-ambitious scheduling that does not match reality](#over-ambitious-scheduling-that-does-not-match-reality)
 
 # Ten Domains
 The following shows ten domains (general problem areas) that I am interested in, including seven unselected and three selected domains.
 
-Seven unselected domains:
+## Seven unselected domains
 1. **Tennis:** Practicing tennis with my coach and friends regularly, competing in local amateur matches, and enjoying exploring new tennis accessories like racquets or shoes.
 
 2. **Limited sneakers and collectable toys:** Following new sneaker and toy releases, collecting limited editions with high price potential, and tracking value change over time.
@@ -37,7 +51,7 @@ Seven unselected domains:
 
 7. **Travel and city exploration:** Discovering unique and cool local spots (which is called “citywalk-ing”) and visiting different countries to explore diverse landscapes and cultures. 
 
-And the following are the three domains I selected:
+## Three selected domains
 
 8. **Online shopping:** I have been an active online shopper for years, with an Amazon Prime membership and regular use of platforms like Best Buy for electronics, eBay for secondhand, rare items, StockX for sneakers, Amazon for everyday goods, and brand websites. While I enjoy browsing for cool products and comparing deals, the shopping experience can be fragmented — finding products I need, switching between multiple platforms to find the best price, keeping track of things I already bought, viewing delivery status, and verifying product authenticity. This domain interests me because it allows me to boost the experience of something that a lot of people and I do almost daily.
 
