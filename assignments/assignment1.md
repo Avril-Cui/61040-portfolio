@@ -12,7 +12,7 @@
 		- [Recovery after workouts, irregular schedules, and stress](#recovery-after-workouts-irregular-schedules-and-stress)
 	- [Productivity, scheduling, and planning](#productivity-scheduling-and-planning)
 		- [Over-ambitious scheduling that does not match reality](#over-ambitious-scheduling-that-does-not-match-reality-✅)
-		- [Time-consuming daily tasks planning and tracking](#time-consuming-daily-tasks-planning-and-tracking)
+		- [Time-consuming planning and tracking](#time-consuming-planning-and-tracking)
 		- [Too many disconnected apps](#too-many-disconnected-apps)
 3. [Stakeholders](#stakeholders)
 	- [Impulse purchases and inconvenient expense tracking](#impulse-purchases-and-inconvenient-expense-tracking)
