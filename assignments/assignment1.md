@@ -73,7 +73,7 @@ When shopping online â€” whether for electronics, sneakers, or everyday items â€
 
 Although this frustration is common, established tools like Honey and CamelCamelCamel already (partly) address it. Creating a solution that meaningfully improves on these products would be challenging and risks lacking differentiation.
 
-### Complexity in tracking package delivery across platforms
+### Complexity in tracking package delivery across multiple platforms
 Shopping on sites like Amazon, eBay, StockX, and brand stores leaves me juggling multiple tracking numbers across emails and apps. Checking delivery status often means digging through messages, logging into accounts, or switching between delivery apps, which is time-consuming and prone to missed updates. I often wish there were a single, unified view of all my deliveries.
 
 The challenge is user indifference: while this problem is a real pain point, many people may not pay for a solution when they can manage by spending extra time (such as tracking delivery status in emails). Building such a product is also technically difficult, since not all e-commerce platforms offer APIs, and scraping delivery data could raise privacy concerns.
