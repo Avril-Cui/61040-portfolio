@@ -80,7 +80,28 @@ My productivity setup is split across multiple platforms—Notion for notes, Tre
 
 However, this problem risks the founder’s fallacy, since many people already commit to only one single platform like Notion or Google Workspace. Building a solution would also be technically challenging, requiring numerous API integrations—and some platforms may not even provide public APIs, creating significant obstacles.
 
+# Stakeholders
 
+## Online Shopping
+1. Shopper (direct user): They are people like me who make impulse purchases online. They are impacted because they feel regret or stress about overspending, and a lack of transparent access to spending records makes the problem even worse for them.
+
+2. Families (indirect users): People who share the Shopper’s finances or living expenses. They may also be affected when overspending leads to tighter budgets or financial conflicts. For instance, parents cut the living expenses they give to their children if their children overspend frequently.
+
+3. Retail platforms (non-users): Online platforms like Amazon and eBay. They benefit from impulse purchases. Any solution that encourages reflection before buying could negatively impact their sales.
+
+## Health (workout and diet)
+1. Food-sensitive individuals (direct users): These are people who regularly experience issues such as constipation, bloating, or fatigue triggered by the foods they eat. Because they are often unaware of their specific sensitivities, they struggle to identify which foods are linked to their symptoms. As a result, they are directly affected by ongoing confusion, discomfort, and uncertainty about their diet.
+
+2. Healthcare professionals (“indirect users”): Doctors and dietitians whom food-sensitive individuals may consult when their symptoms persist. A well-designed solution could support these professionals by providing structured logs and context, making it easier to understand the patient’s dietary patterns and potential triggers.
+
+3. Friends and family (non-users): People who share meals, live together, or socialize with the food-sensitive individuals. They are indirectly impacted when the food-sensitive individuals struggle with food sensitivities. For example, they would need to avoid certain restaurants, change shared meal plans, or be affected by the food-sensitive individual’s low energy or discomfort during activities.
+
+## Productivity, scheduling, and planning
+1. Productivist (direct users): Mostly students and professionals who hope to boost daily productivity through planning and scheduling. They are the primary audience, often overloading schedules and feeling frustrated when plans fail.
+
+2. Peers, teammates, or coworkers (users or non-users): People who are involved in the Productivist’s plans or schedules. When the Productivists’ planning causes missed deadlines or rescheduling, others in their circle are also impacted, causing them to also reschedule to accommodate new changes.
+
+3. Productivity tool developers (non-users): ​​These are companies that create productivity and scheduling apps such as Notion or Google Calendar. Recognizing and addressing this problem could give them valuable insights into designing more adaptive, user-centered tools. However, a highly effective solution may also draw users away from their existing platforms, potentially reducing engagement with their current products.
 
 
 
