@@ -105,7 +105,7 @@ When I plan my daily routines, I often create highly detailed schedules packed w
 
 I chose this problem because it reflects one of the most frustrating parts of my daily routine. I believe there is an authentic demand, since most existing productivity tools cannot quickly and easily adjust to real-time changes in schedules. These tools leave users stuck with rigid plans that do not reflect the realities of their lives. Most apps emphasize “sticking to the plan” instead of helping users adapt to changes gracefully. The framing of this problem requires no critical mass and is not overambitious. By addressing it, I could create something genuinely useful for many people, including myself.
 
-### Time-consuming daily tasks planning and tracking
+### Time-consuming planning and tracking
 I spend a significant amount of time updating information stored in productivity tools to manage my schedule, tasks, progress, and expenses. Most productivity apps require entering so much information that by the time I finish logging, it feels like I’ve spent as much energy organizing my day as I have doing the actual work. While I value being organized, the work it takes to constantly update information is tiring and inefficient. A faster, less repetitive way to log and track routines would make planning feel like support rather than extra work.
 
 The solution to this problem would require ambitious technological innovation, as it involves redefining the way productivity apps function. It would demand creating a new software that operates more efficiently and intuitively than established tools like Notion. Therefore, I didn’t select this problem.
