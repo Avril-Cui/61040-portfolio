@@ -69,7 +69,7 @@ When shopping online, I often make impulse purchases like small accessories, fla
 I selected this problem because impulse shopping is something many shoppers experience regularly. Online platforms are designed to encourage quick purchases through flash sales and recommendations, which makes it difficult to pause and reflect on whether I actually need the item. I believe this problem has authentic demand because financial awareness and budgeting are important to people who shop frequently online. The problem also doesn’t seem to require solutions that are overambitious or require critical mass.
 
 ### Difficulty in finding the best deal across platforms or over time
-When shopping online — whether for electronics, sneakers, or everyday items — I often worry I’m overpaying or missing a better deal elsewhere. Checking multiple sites or tracking prices manually is time-consuming, and I sometimes regret buying too soon when the same product appears cheaper later. This uncertainty makes online shopping stressful.
+When shopping online — whether for electronics, sneakers, or everyday items — I often worry I’m overpaying or missing a better deal elsewhere. Checking multiple sites or tracking price changes manually is time-consuming, and I sometimes regret buying too soon when the same product appears cheaper later. This uncertainty makes online shopping stressful.
 
 Although this frustration is common, established tools like Honey and CamelCamelCamel already (partly) address it. Creating a solution that meaningfully improves on these products would be challenging and risks lacking differentiation.
 
