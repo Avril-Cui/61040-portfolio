@@ -1,7 +1,7 @@
 
 # Table of Contents
 1. [Ten Domains](#ten-domains)
-2. [Problems](#problems)
+2. [Problems and Selections](#problems-and-selections)
 	- [Online shopping](#online-shopping)
 		- [Impulse purchases and inconvenient expense tracking](#impulse-purchases-and-inconvenient-expense-tracking-✅)
 		- [Difficulty in finding the best deal across platforms or over time](#difficulty-in-finding-the-best-deal-across-platforms-or-over-time)
@@ -59,7 +59,7 @@ The following shows ten domains (general problem areas) that I am interested in,
 
 10. **Productivity, scheduling, and planning:** I have the habit of planning out my routine ahead of time and tracking progress daily to (hopefully) enhance productivity. I spend a lot of time experimenting with productivity tools like Notion, calendar apps, and Trello. Although many of these apps are powerful, I often find them overly complex and not tailored to my personal routine. Since I use several apps concurrently, I often spend over an hour each day updating schedules and tracking progress, making me feel inefficient about my daily workflow. During several conversations with friends who also use these productivity tools, we often wonder: Is there a simpler and more elegant solution for productivity management?
 
-# Problems
+# Problems and Selections
 I identified three problem for each of the three selected domains above and highlighted the three problems worth pursuing (marked as ✅).
 
 ## Online shopping
