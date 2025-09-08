@@ -151,7 +151,7 @@ However, this problem may not have a wide demand, since many people already comm
 
 ![impulse spending data3](as1-images/is3.png)
 
-3. 40 % of all e-commerce spending stems from impulse purchases, emphasizing the [large share impulse behavior holds in online retail.](https://www.invespcro.com/blog/impulse-buying/?utm_source=chatgpt.com)
+3. 40 % of all e-commerce spending stems from impulse purchases, emphasizing the [large share impulse behavior holds in online retail.](https://www.invespcro.com/blog/impulse-buying/)
 
 4. The driving forces behind impulse purchase are complex. [Experts defined four types of impulse purchases](https://www.cnbc.com/select/how-to-avoid-impulse-buying/):
     - Pure impulse buying: Purchases driven by sudden emotions or urges, without prior intention
