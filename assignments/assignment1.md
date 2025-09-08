@@ -223,7 +223,7 @@ However, this problem may not have a wide demand, since many people already comm
 ### Comparables
 8. [Reclaim.ai](https://reclaim.ai/) is a software that automatically performs time blocking to achieve better focus and more productive deep work. While the platform provides powerful features, it remains calendar- and schedule-driven. Users must invest effort upfront in configuration, scheduling, and priority tuning, which can make the setup process complex. Moreover, the app lacks adaptive feedback mechanisms to learn from discrepancies between planned tasks and what actually gets accomplished, limiting its ability to optimize future routines.
 
-9. [Apple, Notion, Google Calendar](https://www.notion.com/product/calendar): These are common choices for scheduling daily routines. These apps focus on scheduling and do not offer routine optimization or address the planning fallacy.
+9. [Apple, Notion, Google Calendar](https://www.notion.com/product/calendar): These are common choices for scheduling daily routines to enhance productivity. While upgrades have been made by these app to make updating the schedule smoother, these apps focus on scheduling and do not offer automatic routine optimization or address the planning fallacy.
 
 10. [RescueTime](https://www.rescuetime.com/) is a tool that monitors focus sessions and daily activities, offering valuable logging of how time is actually spent and enabling users to reflect on their workflow. While it helps raise awareness of tasks achieved during a day and can improve focus quality over time, it does not function as an adaptive scheduler. Users must still rely on additional platforms to re-adjust and optimize their plans, which introduces extra complexity.
 
