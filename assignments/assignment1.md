@@ -127,7 +127,7 @@ However, this problem may not have a wide demand, since many people already comm
 ## Food sensitivities and body reactions
 1. Food-sensitive individuals (direct users): These are people who regularly experience issues such as constipation, bloating, or fatigue triggered by the foods they eat. They struggle to identify which foods are linked to their symptoms. As a result, they are directly affected by ongoing confusion, discomfort, and uncertainty about their diet.
 
-2. Healthcare professionals (“indirect users”): Doctors and dietitians whom food-sensitive individuals may consult when their symptoms persist. A well-designed solution could support these professionals by providing structured logs and context, making it easier to understand the patient’s dietary patterns and potential triggers.
+2. Healthcare professionals (“indirect users”): Doctors and dietitians whom food-sensitive individuals may consult when their symptoms persist. They are impacted by the problem because a well-designed solution could support these professionals by providing structured logs and context, making it easier to understand the patient’s dietary patterns and potential triggers.
 
 3. Friends and family (non-users): People who share meals, live together, or socialize with the food-sensitive individuals. They are indirectly impacted when the food-sensitive individuals struggle with food sensitivities. For example, they would need to avoid certain restaurants, change shared meal plans, or be affected by the food-sensitive individual’s low energy or discomfort during activities.
 
