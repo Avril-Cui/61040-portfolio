@@ -211,6 +211,8 @@ However, this problem may not have a wide demand, since many people already comm
 
 4. [Meetings hijack prime focus time](https://www.microsoft.com/en-us/worklab/work-trend-index/breaking-down-infinite-workday): Meetings stretch the day and fragment plans. Microsoft’s 2025 Work Trend Index shows nearly 30% of meetings now span multiple time zones (increased by 35% since 2021), and late-night meetings are up 16% year over year, increasing schedule volatility and off-hours work. The interruptions and fragmentation of daily routines caused by meetings deteriorate workers’ productivity.
 
+![meeting](as1-images/meeting1.png)
+
 5. [Ad-hoc and last-minute changes are common.](https://www.axios.com/2025/06/17/microsoft-remote-work-meetings) 57% of meetings are ad hoc with no calendar schedule or invite, and 10% are added at the last minute, directly undermining rigid daily schedules.
     > "For many, the workday now feels like navigating chaos — reacting to others' priorities and losing focus on what matters most.” 
 
