@@ -209,7 +209,7 @@ However, this problem may not have a wide demand, since many people already comm
 
 3. [Planning fallacy](https://en.wikipedia.org/wiki/Planning_fallacy) is pervasive. Many people systematically underestimate task time compared to reality, which is core to why plans are often too optimistic and scheduled routines go off-script.
 
-4. [Meetings hijack prime focus time](https://www.microsoft.com/en-us/worklab/work-trend-index/breaking-down-infinite-workday): Meetings stretch the day and fragment plans. Microsoft’s 2025 Work Trend Index shows nearly 30% of meetings now span multiple time zones (increased by 35% since 2021), and late-night meetings are up 16% year over year, increasing schedule volatility and off-hours work. The interruptions and fragmentation of daily routines caused by meetings deteriorate workers’ productivity.
+4. [Meetings hijack prime focus time](https://www.microsoft.com/en-us/worklab/work-trend-index/breaking-down-infinite-workday): Meetings stretch the day and fragment plans. Microsoft’s 2025 Work Trend Index shows nearly 30% of meetings now span multiple time zones (increased by 35% since 2021), and late-night meetings are up 16% year over year, increasing schedule volatility and off-hours work. The interruptions and fragmentation of daily routines caused by meetings deteriorate workers’ productivity, making them unable to finish their schedules.
 
 ![meeting](as1-images/meeting1.png)
 
