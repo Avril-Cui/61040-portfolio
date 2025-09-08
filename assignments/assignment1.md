@@ -177,7 +177,7 @@ However, this problem may not have a wide demand, since many people already comm
 
 ## Food sensitivities and body reactions
 ### Evidence
-1. [A large-scale review](https://pubmed.ncbi.nlm.nih.gov/34254938/) found that nutrition app adoption is hindered by hundreds of distinct barriers, ranging from usability issues to trust and privacy concerns. This shows that even though many people want tools to track diet and health, technology often falls short in accessibility and reliability. The conclusion of the research suggests designing nutrition apps to target specific user groups to increase engagement.
+1. [A large-scale review](https://pubmed.ncbi.nlm.nih.gov/34254938/) found that nutrition app adoption is hindered by hundreds of distinct barriers, ranging from usability issues to trust and privacy concerns. This shows that even though many people want tools to track diet and health, technology often falls short in accessibility and reliability. The conclusion of the research suggests designing nutrition apps to target specific user groups with specific demands to increase engagement. In this problem's case, it would be useful to build an app specifically targeting food sensitivity issues.
 
 2. Gluten and carbohydrate sensitivities are [underdiagnosed](https://en.wikipedia.org/wiki/Non-celiac_gluten_sensitivity). Non-celiac gluten sensitivity (NCGS) affects 0.5–13% of the population, and 30% of the population in the United States and Australia were eating gluten-free food regularly in 2014. There exist many unanswered questions around gluten sensitivity, such as whether the symptoms are permanent or transient, depending on the body's condition.
 
