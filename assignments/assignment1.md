@@ -132,7 +132,7 @@ However, this problem may not have a wide demand, since many people already comm
 3. Friends and family (non-users): People who share meals, live together, or socialize with the food-sensitive individuals. They are indirectly impacted when the food-sensitive individuals struggle with food sensitivities. For example, they would need to avoid certain restaurants, change shared meal plans, or be affected by the food-sensitive individual’s low energy or discomfort during activities.
 
 ## Over-ambitious scheduling that does not match reality
-1. Productivist (direct users): Mostly students and professionals who hope to boost daily productivity through planning and scheduling. They are the primary audience, often overloading schedules and feeling frustrated when plans fail.
+1. Productivist (direct users): Mostly students and professionals who hope to boost daily productivity through planning and scheduling. They are the primary users, often overloading schedules and feeling frustrated when plans fail.
 
 2. Peers, teammates, or coworkers (users or non-users): People who are involved in the Productivist’s plans or schedules. When the Productivists’ planning causes missed deadlines or rescheduling, others in their circle are also impacted, causing them to also reschedule to accommodate new changes.
 
