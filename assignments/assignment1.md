@@ -120,7 +120,7 @@ However, this problem may not have a wide demand, since many people already comm
 ## Impulse purchases and inconvenient expense tracking
 1. Shopper (direct user): They are people like me who make impulse purchases online. They are impacted because they feel regret or stress about overspending, and a lack of transparent access to spending records makes the problem even worse for them, because they are unaware of the amount they have spent on impulse purchases.
 
-2. Families (indirect users): People who share the Shopper’s finances or living expenses. They may also be affected when overspending leads to tighter budgets or financial conflicts. For instance, parents cut the living expenses they give to their children if their children overspend frequently.
+2. Families (non-users): People who share the Shopper’s finances or living expenses. They may also be affected when overspending leads to tighter budgets or financial conflicts. For instance, parents cut the living expenses they give to their children if their children overspend frequently.
 
 3. Retail platforms (non-users): Online platforms like Amazon and eBay. They benefit from impulse purchases. Any solution that encourages reflection before buying could negatively impact their sales.
 
