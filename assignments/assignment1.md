@@ -125,7 +125,7 @@ However, this problem may not have a wide demand, since many people already comm
 3. Retail platforms (non-users): Online platforms like Amazon and eBay. They benefit from impulse purchases. Any solution that encourages reflection before buying could negatively impact their sales.
 
 ## Food sensitivities and body reactions
-1. Food-sensitive individuals (direct users): These are people who regularly experience issues such as constipation, bloating, or fatigue triggered by the foods they eat. Because they are often unaware of their specific sensitivities, they struggle to identify which foods are linked to their symptoms. As a result, they are directly affected by ongoing confusion, discomfort, and uncertainty about their diet.
+1. Food-sensitive individuals (direct users): These are people who regularly experience issues such as constipation, bloating, or fatigue triggered by the foods they eat. They struggle to identify which foods are linked to their symptoms. As a result, they are directly affected by ongoing confusion, discomfort, and uncertainty about their diet.
 
 2. Healthcare professionals (“indirect users”): Doctors and dietitians whom food-sensitive individuals may consult when their symptoms persist. A well-designed solution could support these professionals by providing structured logs and context, making it easier to understand the patient’s dietary patterns and potential triggers.
 
