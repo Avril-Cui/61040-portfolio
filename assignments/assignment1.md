@@ -167,7 +167,7 @@ However, this problem may not have a wide demand, since many people already comm
     - Real-time updates
 
 ### Comparables
-7. The [Stop Impulse Buying](https://www.stopimpulse.com/) app offers a no-spending tracker and savings challenges designed to reduce impulse purchases. However, it functions largely as a static platform that delivers educational and motivational content. Its biggest limitation is the heavy reliance on manual user engagement — something many impulsive shoppers may find difficult to sustain.
+7. The [Stop Impulse Buying](https://www.stopimpulse.com/) app offers a no-spending challenge tracker and savings challenges designed to reduce impulse purchases. However, it functions largely as a static platform that delivers educational and motivational content. Its biggest limitation is the heavy reliance on manual user engagement — something many impulsive shoppers may find difficult to sustain.
 
 8. The [SpendWise](https://apps.apple.com/us/app/spendwise-mindful-spending/id6496203443) app tracks shopping carts and spending while motivating users to avoid impulse purchases by highlighting the money they’ve saved. However, it does not actively assist users in deciding whether an item is a “need” or a “want,” which are crucial in addressing impulse purchases. Shoppers must still spend time reflecting on these decisions themselves, limiting the app’s effectiveness at the moment of purchase.
 
