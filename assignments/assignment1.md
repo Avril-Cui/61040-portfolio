@@ -161,10 +161,10 @@ However, this problem may not have a wide demand, since many people already comm
 
 5. [Psychologists explain that emotional triggers drive impulse purchases.](https://time.com/6200717/online-shopping-psychology-explained/) For example, Jorge Barraza, program director and assistant professor in the online master of science in applied psychology program at the University of Southern California, said, “When we’re sad, when we’re stressed, we’re more likely to engage in this kind of behavior.” Nevertheless, in many cases, this spark of excitement from buying interesting items do not persist, especially when shoppers realized they have overspent their money.
 
-6. [Expert suggests that apps with the following features can reduce impulse purchases:](https://aicompetence.org/stop-impulse-buying-with-smart-ai-apps/)
-Customized spending alert
-Clear insights into users’ financial health
-Real-time updates
+6. [Expert suggests that although many are impacted by impulse purchases, apps with the following features can help reduce impulse purchases:](https://aicompetence.org/stop-impulse-buying-with-smart-ai-apps/)
+    - Customized spending alert
+    - Clear insights into users’ financial health
+    - Real-time updates
 
 ### Comparables
 7. The [Stop Impulse Buying](https://www.stopimpulse.com/) app offers a no-spending tracker and savings challenges designed to reduce impulse purchases. However, it functions largely as a static platform that delivers educational and motivational content. Its biggest limitation is the heavy reliance on manual user engagement — something many impulsive shoppers may find difficult to sustain.
