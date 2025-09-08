@@ -113,7 +113,7 @@ The solution to this problem would require ambitious technological innovation, a
 ### Too many disconnected apps
 My productivity setup is split across multiple platforms—Notion for notes, Trello for projects, Google Calendar for scheduling, and more. Each tool works well in its own domain, but they don’t integrate smoothly. I end up duplicating information, forgetting updates, or feeling overwhelmed and losing track of tasks. Switching between so many apps just to stay organized feels inefficient. A unified system that integrates core features would be beneficial.
 
-However, this problem risks the founder’s fallacy, since many people already commit to only one single platform like Notion or Google Workspace. Building a solution would also be technically challenging, requiring numerous API integrations—and some platforms may not even provide public APIs, creating significant obstacles.
+However, this problem may not have an authentic demand, since many people already commit to only one single platform like Notion or Google Workspace. Building a solution would also be technically challenging, requiring numerous API integrations—and some platforms may not even provide public APIs, creating significant obstacles.
 
 # Stakeholders
 
