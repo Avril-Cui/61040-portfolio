@@ -6,7 +6,7 @@ There are two invariants of the state.
 ### Invariant 1 (counts/aggregation) - most important
 At any time, for every request in a registry, the remaining count is never negative (`request.count` $\geq 0$).
 
-I think this invariant is the most important, because we need a system in which the requests reflect the amount of items the recipient still needs, preventing overselling the wishlist. If we don't limit `request.count` to be nonnegative, givers can make more purchases than what the recipient asks for, contradicting the purpose of having a registry system.
+I think this invariant is the most important, because we need a system in which the requests' counts reflect the amount of items the recipient still needs, preventing overselling the wishlist. If we don't limit `request.count` to be nonnegative, givers can make more purchases than what the recipient asks for, contradicting the purpose of having a registry system.
 
 The action whose design is most affected by this invariant is the action `purchase (purchaser: User, registry: Registry, item: Item, count: Number)`. This action has a precondition that specifies "registry exists, is active, and has a request for this item with at least count" and a `effects` clause that decrements the count in the matching request. Since this action requires the request for this item to have at least the asked amount of counts by the purchase, the `count` for the corresponding request is still $\geq 0$ after decrementing. Therefore, the invariant is preserved by this action.
 
