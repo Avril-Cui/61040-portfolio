@@ -154,7 +154,7 @@ concept PersonalAccessTokenClassic
 
 purpose
     enable programmatic authentication and access on behalf of a user
-    without sharing their password
+    to enable different access scope and expiration without sharing their password
 
 principle
     a user generates a token with a chosen scope and expiration;
