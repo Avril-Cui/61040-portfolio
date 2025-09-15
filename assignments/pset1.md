@@ -150,7 +150,7 @@ actions
 # Exercise 3: Comparing concepts
 
 ```
-concept PersonalAccessTokenClassic [User]
+concept PersonalAccessTokenClassic
 
 purpose
     enable programmatic authentication and access on behalf of a user
