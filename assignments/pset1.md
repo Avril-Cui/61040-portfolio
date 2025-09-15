@@ -219,7 +219,7 @@ Consider the following different use cases:
 ## Conference Room Booking
 
 ```
-concept ConferenceRoomBooking [User, Item]
+concept ConferenceRoomBooking
 
 purpose Let people reserve public conference rooms at specific times to avoid conflict
 
@@ -289,7 +289,7 @@ It is also worth noticing that admins are special users in charge of maintaining
 ## Billable Hours Tracking
 
 ```
-concept BillableHoursTracking [User, Item]
+concept BillableHoursTracking
 
 purpose Record billable work sessions per employee per project
 
@@ -361,7 +361,7 @@ Companies can calculate the work duration for each session with duration = endTi
 ## URL Shortener
 
 ```
-concept UrlShortener [User, Item]
+concept UrlShortener
 
 purpose Provide short aliases that redirect to long target URLs for convenience
 
