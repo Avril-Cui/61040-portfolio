@@ -218,54 +218,54 @@ Consider the following different use cases:
 
 ## Conference Room Booking
 
-Define a concept for the essential function of a service for booking conference rooms in a company or university department, like CSAIL’s room booking system. Note: you do not need to include recurring bookings.
+```
+concept ConferenceRoomBooking [User, Item]
 
+purpose Let people reserve public conference rooms at specific times to avoid conflict
 
-**concept** ConferenceRoomBooking [User, Item]
-
-**purpose** let people reserve public rooms at specific times to avoid conflict
-
-**principle**
-    an admin creates availability slots for rooms with start and end times
+principle
+    an admin creates available slots for rooms for different time
     a user reserve an available slot for a room
     a reserved slot cannot be double-booked
     a user can cancel their reservation
     an admin can deactivate slots
 
-**state**
-    a set of Bookings with
-        a User
-        a Slot
-    
+state
+    a set of Rooms with
+        a capacity Number
+        a roomId String    // this roomId is a unique identifier
+
     a set of Slots with
         a Room
         a Time
         an active Flag
     
-    a set of Rooms with
-        a capacity Number
+    a set of Bookings with
+        a User
+        a Slot
+    
+actions
+    addRoom (user: User, capacity: Number, roomId: String): (room: Rooms)
+        requires: user is admin and no room exists with this roomId
+        effects: make room with this capacity and roomId
 
-**actions**
-
-    addRoom (capacity: Number): (room: Rooms)
-        **effects** make room with this capacity
-
-    createSlot (room: Room, time: Time): (slot: Slot)
-        **requires**
-            room exists \
-            input start is before end \
-            no slot exists with the same room and time
+    createActiveSlot (user: User, room: Room, time: Time): (slot: Slot)
+        requires
+            user is admin, and
+            room exists, and
+            no active slot exists with the same room and time
         
         **effects** 
-            create a fresh slot for this room and time, and set active as True
+            if a slot already exists with the same room and time, make this slot active;
+            otherwise, create a fresh slot for this room and time, and set active as True
         
-    deactivateSlot (slot: Slot)
-        **requires** slot exists and slot is active
-        **effects** set slot as not active
+    deactivateSlot (user: User, slot: Slot)
+        requires: user is admin, slot exists, and slot is active
+        effects: set slot as not active
     
     reserve (user: User, slot: Slot, capacity: Number): (booking: Booking)
-        **requires**
-            slot exists and slot is not active
+        requires
+            slot exists and slot is active
             no booking exists for this slot
             the user requested capacity is less than the capacity of the room for this slot
         
@@ -273,15 +273,18 @@ Define a concept for the essential function of a service for booking conference 
             create a new booking for this user and slot
     
     cancelReserve (user: User, booking: Booking)
-        **requires** booking exists and has the matching user
-        **effects** remove booking
+        requires: booking exists and has the matching user
+        effects: remove booking from the set of Bookings
+```
 
 There are two core invariants that needs to be preserved:
-1. There is at most one slot per (room, time) pair. The base case is good under this invariant because we initially have an empty set of slots. We guard this invariant by the requires statement for `createSlot`, which explicitly requires "no slot exists with the same room and time."
+1. There is at most one slot per (room, time) pair. The base case is good under this invariant because we initially have an empty set of slots. We guard this invariant by the requires statement for `createActiveSlot`, which explicitly requires "no slot exists with the same room and time."
 
-2. There is at most one booking per slot, avoiding double-booking. The base case is good under this invariant because we initially have an empty set of booking. We guard this invariant by the requires statement for `reserve`, which checks "no booking exists for this slot."
+2. There is at most one booking per slot, avoiding double-booking. The base case is good under this invariant because we initially have an empty set of bookings. We guard this invariant by the requires statement for `reserve`, which checks "no booking exists for this slot."
 
 Since we start with a good base case for both invariants, and no transition/action would turn a good state into a bad state, the invariants are preserved.
+
+It is also worth noticing that admins are special users in charge of maintaining the reservation system. Thus, they are the only users that can call `addRoom`, `createActiveSlot`, and `deactivateSlot` actions.
 
 ## Billable Hours Tracking
 
