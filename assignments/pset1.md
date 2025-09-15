@@ -74,77 +74,78 @@ SKU code also offers an efficient and handy way to query for items, since we onl
 
 # Exercise 2: Extending a familiar concept
 ## Q1 and Q2
-**concept** PasswordAuthentication
+```
+concept PasswordAuthentication[User]
 
-**purpose** limit access to known users
+purpose limit access to known users
 
-**principle** after a user registers with a username and a password, they can authenticate with that same username and password and be treated each time as the same user
+principle
+    after a user registers with a username and a password,
+    they can authenticate with that same username and password
+    and be treated each time as the same user
 
-**state**
+state
+    a set of Users with
+        a username String
+        a password String
 
-a set of Users with
-
-    a username String
-    a password String
-
-**actions**
-
+actions
     register (username: String, password: String): (user: User)
-        **requires** no user exists with this username
-        **effects** create and return a new user with this username and password
+        requires: no user exists with this username
+        effects:
+            creates a new user with this username and password
+            returns the new user
 
     authenticate (username: String, password: String): (user: User)
-        **requires exists a user with this user name and password
-        **effects* return that user u
+        requires: exists a user with this username and password
+        effects: return that matching user
+```
 
 ## Q3
-The invariant for the state would be there is at most one user with a given username. 
+**Invariant**: There is at most one user with a given username. This also means we have unique usernames in the User set.
 
-The initial state (base case) is good, because by default, we have an empty set of Users. So, the base case is trivial and the invariant holds for the base case.
+The initial state (base case) is good because by default, we have an empty set of Users. So, the base case is trivial, and the invariant holds for the base case.
 
 During the inductive steps (i.e., during transitions made by the actions), only the **register** action can possibly break the invariant, so we need to guard the **register** action. The precondition "no user exists with this username" ensures that one username will not get registered twice to create two different users. **authenticate** action does not mutate the state, so it will not violate the invariant. Since the initial state is good and no action can violate the invariant (i.e., turning a good state into a bad state), the invariant is preserved.
 
 ## Q4
-We augment the state and actions.
+We augment the state and actions to include this functionality.
 
-**state**
+```
+state
+    a set of Users with
+        a username String
+        a password String
+        a confirmed Flag   // true if email is confirmed
 
-a set of Users with
+    a set of Confirmations with
+        a user User
+        a secretToken String   // secret token generated during registration
 
-    a username String
-    a password String
-    an email String
-    a confirmed Flag
-
-a set of Confirmations with
-
-    a user User
-    a token Secret
-
-**actions**
-
-    register (username: String, password: String, email: String): (user: User, token: Secret)
-        **requires** no user exists with this username
-        **effects**
-            create a new user with this username and password and not confirmed
-            create a new confirmation for the user with with a new Secret token
-            return the user and the Secret token
+actions
+    register (username: String, password: String): (user: User, secretToken: String)
+        requires: no user exists with this username
+        effects:
+            create a new user with this username and password
+            set confirmed as False for this newly created user
+            create a new confirmation for this user with a new secretToken
+            return the new user and the secretToken
         
-    confirm (username: String, token: Secret)
-        **requires**
+    confirm (username: String, secretToken: String)
+        requires:
             exists a user with this username and
             the user is not confirmed and
-            exists a confirmation for this user with the matching Secret token
+            exists a confirmation for this user with the matching secretToken
         **effects**
-            make the corresponding user confirmed
+            make the corresponding user's confirmed flag as True
+            remove the confirmation for this user
 
     authenticate (username: String, password: String): (user: User)
-        **requires exists a user with this username and password
-        **effects* return that user
+        requires:
+            exists a user with this username and matching password and has confirmed as True
+        effects: return that matching user
+```
 
-**invariants**
-1. At most one user with a given username
-2. The Secret token for each Confirmation will not get reused. This also means each Secret token belongs to exactly one user.
 
 # Exercise 3: Comparing concepts
 
