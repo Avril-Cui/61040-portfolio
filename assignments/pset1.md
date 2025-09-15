@@ -1,36 +1,32 @@
 # Exercise 1: Reading a concept
 
 ## Q1
-Invariants. What are two invariants of the state? (Hint: one is about aggregation/counts of items, and one relates requests and purchases). Say which one is more important and why; identify the action whose design is most affected by it, and say how it preserves it.
-
 There are two invariants of the state.
 
-### Invariant 1
-At any time, for every Request in a Registry, the remaining count is never negative (`Request.count` $\geq 0$).
+### Invariant 1 (counts/aggregation) - most important
+At any time, for every request in a registry, the remaining count is never negative (`request.count` $\geq 0$).
 
-The action whose design is most affected by this invariant is the action `purchase (purchaser: User, registry: Registry, item: Item, count: Number)`. This action has a `requires` clause that specifies "registry exists, is active and has a request for this item with at least count" and a `effects` clause that decrements the count in the matching request. Since this action requires the Request for this `item` has at-least the asked amount of counts by the purchase, the `count` for the corresponding Request is still $\geq 0$. Therefore, the invariant is preserved.
+I think this invariant is the most important, because we need a system in which the requests reflect the amount of items the receiver still needs, preventing overselling the wishlist. If we don't limit `request.count` to be nonnegative, givers can make more purchases than what the receiver asks for, contradicting the purpose of having a registry system.
 
-I think this invariant is the most important, because the system would be problematic if many buyers make more purchases that what the Requests ask for, contradicting the purpose for having a registry system. The buyers would have spend this money on purchasing other available Requests. There would then a many waste of resources if this invariant is not preserved.
+The action whose design is most affected by this invariant is the action `purchase (purchaser: User, registry: Registry, item: Item, count: Number)`. This action has a precondition that specifies "registry exists, is active, and has a request for this item with at least count" and a `effects` clause that decrements the count in the matching request. Since this action requires the request for this item to have at least the asked amount of counts by the purchase, the `count` for the corresponding request is still $\geq 0$ after decrementing. Therefore, the invariant is preserved by this action.
 
 ### Invariant 2
-Every Purchase belongs to exactly one Request, and this Purchase's' `Item` must matches the corresponding Request’s `Item`.
+Every purchase must belong to exactly one request, and this purchase's item must match the corresponding request’s item.
 
-// ONLY THE MOST IMPORTANT ONE HERE
+There are several actions whose design is affected by this invariant:
+1. `purchase` action has a `requires` statement that checks that there exists reRequest for this item. Thus, it ensures every new, valid purchase must have a matching request with the same `item`, preserving the invariant.
 
-
-There are several actions whose design are most affected by this invariant:
-1. `purchase` has a `requires` statement that checks there exists a Request for this item. Thus, it ensures every new, valid Purchase must have a matching Request with the same `item`, preserving the invariant.
-
-2. `addItem` has an `effects` clause stating that "if a request for this item exists, add the count; otherwise create a new request for the item with this count and add to registry." This clause ensures that no two Requests will have the same `item`, because the second `addItem` call will simply add the `count` of the first created Request. This, the action ensures every Purchase will only have one Request with a matching `Item`, preserving the invariant.
-
-3. `removeItem` must remove the corresponding Request as well as any contained/matched Purchases so that no Purchase is left unattached. In this way, we preserve the invariant.
+2. `addItem` action has an `effects` clause stating that "if a request for this item exists, add the count; otherwise create a new request for the item with this count and add to the registry." This clause ensures that no two requests will have the same `item`, because the second `addItem` call will simply add the `count` of the first created request. Thus, this action preserves the invariant.
 
 ## Q2
-Fixing an action. Can you identify an action that potentially breaks this important invariant, and say how this might happen? How might this problem be fixed?
 
-`purchase (purchaser: User, registry: Registry, item: Item, count: Number)` does not require the `count` to be positive. If `count` is negative, then due to Invariant 1, the count for the corresponding Request is always greater than the count for this "negative" Purchase. However, this negative Purchase is meaningless and would increase the `count` for the corresponding Request (since decrement by a negative number means to increase), potentially leading to oversell during later Purchases since the Request didn't meant to ask for this many `count`. This problem is the case for an "unsafe design" mentioned in lecture, where we have a transition from good states to some bad state.
+`addItem (registry: Registry, item: Item, count: Number)` does not require the `count` to be positive. If `count` is negative, then we can continue to perform `addItem` on the same existing registry and item, which will repeatedly toggle the "effects" statement to add the negative count. This would mean continuously decreasing the count of the request for this item, and eventually we would reach negative count, which breaks Invariant 1. This problem is the case for an "unsafe design" mentioned in lecture, where we have a transition from good states to some bad state.
 
-A fix would be tightening the requirement to `requires count > 0` for `purchase`. This ensures that the inductive step holds. Given `counts` that are non-negative before the action, they remain so after the action because the only change is a decrease by a positive amount after tightening the requirement. 
+A fix would be tightening the precondition to `requires count > 0` for `addItem`. This ensures that the inductive step holds. Given `counts` that are non-negative before the action, they remain so after the action because now we can only increase the count, which started as non-negative. So, by induction, Invariant 1 is preserved after the fix. 
+
+<!-- `purchase (purchaser: User, registry: Registry, item: Item, count: Number)` does not require the `count` to be positive. If `count` is negative, then due to Invariant 1, the count for the corresponding Request is always greater than the count for this "negative" Purchase. However, this negative Purchase is meaningless and would increase the `count` for the corresponding Request (since decrement by a negative number means to increase), potentially leading to oversell during later Purchases since the Request didn't meant to ask for this many `count`. This problem is the case for an "unsafe design" mentioned in lecture, where we have a transition from good states to some bad state.
+
+A fix would be tightening the requirement to `requires count > 0` for `purchase`. This ensures that the inductive step holds. Given `counts` that are non-negative before the action, they remain so after the action because the only change is a decrease by a positive amount after tightening the requirement.  -->
 
 ## Q3
 Inferring behavior. The operational principle describes the typical scenario in which the registry is opened and eventually closed. But a concept specification often allows other scenarios. By reading the specs of the concept actions, say whether a registry can be opened and closed repeatedly. What is a reason to allow this?
@@ -45,9 +41,9 @@ Registry deletion. There is no action to delete a registry. Would this matter in
 `close` is a substitute version of delete. However, it would matter in practice, because if users no longer want a registry, the only thing they can do is to `close` this registry. This means that these registries that users no longer want eventually accumulate in our database, taking up extra spaces, which is an extra cost for data storage in practice. 
 
 ## Q5
-Queries. What are two common queries likely to be executed against the concept state? (Hint: one is executed by a registry owner, and one by a giver of a gift.)
-
-SKIP
+Two common queries likely to be executed against the concept state are:
+1. Which request's item have been purchased by givers, and which givers have made those purchases? This is an important query executed by the registry owner because they can track the progress of their registry, as well as helping them understand who purchased items for them so that they can send thank-you notes later on.
+2. Which request's item are still available for purchase, and how many are there left? This is am important query executed by the givers so that they can decide which items to buy and how many.
 
 ## Q6
 Hiding purchases. A common feature of gift registries is to allow the recipient to choose not to see purchases so that an element of surprise is retained. How would you augment the concept specification to support this?
