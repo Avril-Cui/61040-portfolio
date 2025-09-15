@@ -6,17 +6,17 @@ There are two invariants of the state.
 ### Invariant 1 (counts/aggregation) - most important
 At any time, for every request in a registry, the remaining count is never negative (`request.count` $\geq 0$).
 
-I think this invariant is the most important, because we need a system in which the requests reflect the amount of items the receiver still needs, preventing overselling the wishlist. If we don't limit `request.count` to be nonnegative, givers can make more purchases than what the receiver asks for, contradicting the purpose of having a registry system.
+I think this invariant is the most important, because we need a system in which the requests reflect the amount of items the recipient still needs, preventing overselling the wishlist. If we don't limit `request.count` to be nonnegative, givers can make more purchases than what the recipient asks for, contradicting the purpose of having a registry system.
 
 The action whose design is most affected by this invariant is the action `purchase (purchaser: User, registry: Registry, item: Item, count: Number)`. This action has a precondition that specifies "registry exists, is active, and has a request for this item with at least count" and a `effects` clause that decrements the count in the matching request. Since this action requires the request for this item to have at least the asked amount of counts by the purchase, the `count` for the corresponding request is still $\geq 0$ after decrementing. Therefore, the invariant is preserved by this action.
 
 ### Invariant 2
 Every purchase must belong to exactly one request, and this purchase's item must match the corresponding request’s item.
 
-There are several actions whose design is affected by this invariant:
+<!-- There are several actions whose design is affected by this invariant:
 1. `purchase` action has a `requires` statement that checks that there exists reRequest for this item. Thus, it ensures every new, valid purchase must have a matching request with the same `item`, preserving the invariant.
 
-2. `addItem` action has an `effects` clause stating that "if a request for this item exists, add the count; otherwise create a new request for the item with this count and add to the registry." This clause ensures that no two requests will have the same `item`, because the second `addItem` call will simply add the `count` of the first created request. Thus, this action preserves the invariant.
+2. `addItem` action has an `effects` clause stating that "if a request for this item exists, add the count; otherwise create a new request for the item with this count and add to the registry." This clause ensures that no two requests will have the same `item`, because the second `addItem` call will simply add the `count` of the first created request. Thus, this action preserves the invariant. -->
 
 ## Q2
 
@@ -29,49 +29,48 @@ A fix would be tightening the precondition to `requires count > 0` for `addItem`
 A fix would be tightening the requirement to `requires count > 0` for `purchase`. This ensures that the inductive step holds. Given `counts` that are non-negative before the action, they remain so after the action because the only change is a decrease by a positive amount after tightening the requirement.  -->
 
 ## Q3
-Inferring behavior. The operational principle describes the typical scenario in which the registry is opened and eventually closed. But a concept specification often allows other scenarios. By reading the specs of the concept actions, say whether a registry can be opened and closed repeatedly. What is a reason to allow this?
+Yes, repeated opening and closing is allowed. Since the only requirements for `open (registry: Registry)` are that the registry exists and it is not active, a registry that was closed also satisfies this precondition. Similarly, once a registry is opened, it also satisfies the precondition for `close (registry: Registry)`. Therefore, we can have $open\to close\to open\to close...$ arbitrarily many times.
 
-Yes, repeated opening and closing is allowed. Since the only requirements for `open (registry: Registry)` are the registry exists and it is not active, a registry that was closed also satisfies this precondition. Similarly, once a registry is open, it also satisfies the precondition (i.e., registry exists and is active) for `close (registry: Registry)` Therefore, we can have $open\to close\to open\to close...$ arbitrarily many times.
-
-The reason why we allow this is to let the recipient pause public visibility of their registry without completing deleting/destroying the registry. For example, they might want to pause visibility if they want to edit the items or fix any mistakes, then reopen when they are ready. The repeated opening and closing keeps the registry's history, making it more convenient for the recipient.
+The reason why we allow this is to let the recipient pause public visibility of their registry without completely deleting/destroying their registry. For example, they might want to pause visibility if they want to edit the items or fix any mistakes, then reopen when they are ready. The repeated opening and closing keep the registry's history, making it more convenient for the recipient.
 
 ## Q4
-Registry deletion. There is no action to delete a registry. Would this matter in practice?
-
-`close` is a substitute version of delete. However, it would matter in practice, because if users no longer want a registry, the only thing they can do is to `close` this registry. This means that these registries that users no longer want eventually accumulate in our database, taking up extra spaces, which is an extra cost for data storage in practice. 
+`close` is a substitute version of delete, which makes a registry inactive and hidden from public view. However, it would matter in practice because if users no longer want a registry, the only thing they can do is to `close` it. This means that these old, unused registries remain in the system's database indefinitely, taking up extra spaces, which is an extra cost for data storage in practice. 
 
 ## Q5
 Two common queries likely to be executed against the concept state are:
-1. Which request's item have been purchased by givers, and which givers have made those purchases? This is an important query executed by the registry owner because they can track the progress of their registry, as well as helping them understand who purchased items for them so that they can send thank-you notes later on.
-2. Which request's item are still available for purchase, and how many are there left? This is am important query executed by the givers so that they can decide which items to buy and how many.
+1. For a registry owner: Which request's items have been purchased by givers, and which givers have made those purchases? Registry owners need to understand this to track the progress of their registry. They also need this information to send thank-you notes to givers later on.
+
+2. For a giver of a gift: Which request's items are still available for purchase, and how many remain? This query helps givers understand which items are needed and in what quantity, so they don't overspend or buy something already covered.
 
 ## Q6
-Hiding purchases. A common feature of gift registries is to allow the recipient to choose not to see purchases so that an element of surprise is retained. How would you augment the concept specification to support this?
+First, we augment the **state**, in particular, the Requests set:
 
-First, we augment the **state**, in particular, the Requests:
+```
+a set of Registrys with
+    an owner User
+    an active Flag
+    a set of Requests
+    a surpriseMode Flag
+```
 
-a set of Registrys with \
-    an owner User \
-    an active Flag \
-    a set of Requests \
-    a surpriseMode Flag 
+We also augment the **actions** by adding two new actions:
 
-We also augment the **actions** by adding two actions:
+```
+setSurpriseMode (registry: Registry)
+    requires: registry exists and it is not on surpriseMode
+    effects: make registry surpriseMode
 
-setSurpriseMode (registry: Registry) \
-    **requires** registry exists and it is not on surpriseMode \
-    **effects** made registry surpriseMode
+removeSurpriseMode (registry: Registry)
+    requires: registry exists and it is on surpriseMode
+    effects: make registry not surpriseMode
+```
 
-removeSurpriseMode (registry: Registry) \
-    **requires** registry exists and it is on surpriseMode \
-    **effects** made registry not surpriseMode
+Now, if the registry is on surpriseMode, recipient will not be able to see information related to purchases through queries.
 
 ## Q7
-Generic types. The User and Item types are specified as generic parameters. The Item type might be populated by SKU codes, for example. Explain why this is preferable to representing items with their names, descriptions, prices, etc.
+By writing User and Item types as generic parameters, we make the concept polymorphic. In this way, we don't need to commit to any particular representation of users or items, but simply assume that some external system will provide opaque identifiers of these types. This enables abstraction and stability: if item details/attributes change over time, the registry logic will still hold. 
 
-Using generic parameters means we have polymorphic type passing in and out of actions. This is preferable to representing items with their names because in this way, our concept assumes nothing about these parameters, and they are just opaque references to any kind of users and any kind of items. This enables reusability and generalization, and we won't need to worry about minor details like changes in the specific item representations.
-
-It also offers a quick and handy way to query for items, since we won't need to check if all properties like names, descriptions, prices match up.
+SKU code also offers an efficient and handy way to query for items, since we only need to perform one-dimensional lookups instead of checking if all properties like names, descriptions, and prices match up.
 
 # Exercise 2: Extending a familiar concept
 ## Q1 and Q2
