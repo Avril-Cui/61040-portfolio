@@ -75,7 +75,7 @@ SKU code also offers an efficient and handy way to query for items, since we onl
 # Exercise 2: Extending a familiar concept
 ## Q1 and Q2
 ```
-concept PasswordAuthentication[User]
+concept PasswordAuthentication
 
 purpose limit access to known users
 
