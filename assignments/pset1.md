@@ -38,9 +38,9 @@ The reason why we allow this is to let the recipient pause public visibility of 
 
 ## Q5
 Two common queries likely to be executed against the concept state are:
-1. For a registry owner: Which request's items have been purchased by givers, and which givers have made those purchases? Registry owners need to understand this to track the progress of their registry. They also need this information to send thank-you notes to givers later on.
+1. For a registry owner (query about purchases): Which request's items have been purchased by givers, and which givers have made those purchases? Registry owners need to understand this to track the progress of their registry. They also need this information to send thank-you notes to givers later on.
 
-2. For a giver of a gift: Which request's items are still available for purchase, and how many remain? This query helps givers understand which items are needed and in what quantity, so they don't overspend or buy something already covered.
+2. For a giver of a gift (query about requests): Which request's items are still available for purchase, and how many remain? This query helps givers understand which items are needed and in what quantity, so they don't overspend or buy something already covered.
 
 ## Q6
 First, we augment the **state**, in particular, the Requests set:
