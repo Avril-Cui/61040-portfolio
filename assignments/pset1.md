@@ -149,21 +149,23 @@ actions
 
 # Exercise 3: Comparing concepts
 
-**concept** PersonalAccessTokenClassic [User, Item]
+```
+concept PersonalAccessTokenClassic [User]
 
-**purpose** \
-    enable programmatic access on behalf of a user without sharing their password
+purpose
+    enable programmatic authentication and access on behalf of a user
+    without sharing their password
 
-**principle** \
-    a user generates a token with a chosen scope; \
-    the system returns the token's secret once; \
-    the user can authenticate using the token; \
+principle
+    a user generates a token with a chosen scope and expiration;
+    the system returns the token's secret once;
+    the user can authenticate using the token with access limited to the preset scope and expiration;
     the token can be deleted, after which it can not authenticate;
 
-**state**
+state
     a set of Tokens with
         an owner User
-        a secret Secret
+        a secret String
         a scope Scope
         a revoked Flag
         an expiration Time
@@ -172,94 +174,47 @@ actions
         an username String
 
 **actions**
-    createToken (owner: User, scope: Scope, expiration: Time): (token: Token, secret: Secret):
-        <!-- requires owner exists (need a owner state) -->
-        **effects**
-            create a new token with this owner;
-            set the scope as the provided or default scope, 
-            set revoked to false,
-            set a newly generated secret string,
-            set expiration as the provided or default time
-            return the token's secret
+    createToken (owner: User, scope: Scope, expiration: Time): (secret: String):
+        requires: exist owner
+        effects:
+            create a new token with this owner with:
+                the scope as the provided or default scope, 
+                revoked as false,
+                secret as a newly generated secret string,
+                expiration as the provided or default time
+            return the token's secret once
     
     deleteToken (owner: User, token: Token)
-        **requires** token exists and the owner of the token matches the action's input owner and deleted is false
-        **effects** make deleted true
+        requires:
+            token exists and
+            the owner of the token matches the action's owner and
+            revoked is false
+        **effects** make revoked true
     
-    authenticateWithToken (username: String, secret: Secret) : (user: User)
-        **requires**
-            a token exists with a secret matching the action's input secret,
-            and the owner of this token has the matching username,
-            and deleted is false for this token,
-            and the current timestamp is before expiration for this token
-        **effects** authentication passed, return that owner
+    authenticateWithToken (username: String, secret: String) : (user: User)
+        requires:
+            a token exists with a secret matching the action's input secret, and
+            revoked is false for this token, and
+            the current timestamp is before expiration for this token
+        effects: authentication success
+```
 
-Additionally, there is an important invariant for the state:
-1. Each secret belongs to exactly one token
+It is worth noticing that, according to the GitHub Page, although users are required to enter their username along with the personal access token, the username is not used to authenticate the user. So, in the `authenticateWithToken` action, username is not used in the precondition.
 
 ## Difference with PasswordAuthentication
-For PersonalAccessToken, one user can be the owner for multiple tokens at the same time, each with its own scopes and expiration. User can also revoke the tokens individually. This differentiates PersonalAccessToken from PasswordAuthentication. For PasswordAuthentication, each user would only have a single password. Consider the following different use cases:
-- PasswordAuthentication: log in to the web UI, authenticate as the user for a session to change profile, set up billing information, or interact as a "user" (for example, posting under this user profile)
-- PersonalAccessToken: create a new token with different scopes and expirations for each server, app, or bot. This allows per-integration or per-action permission isolation. PersonalAccessToken would be especially good for dev (and this is why GitHub implements it) because of its environment isolation and separation.
+PersonalAccessToken and PasswordAuthentication are both used for authentication, but they serve different use cases and thus have different designs.
+
+For PasswordAuthentication, each user would only have a single password. For PersonalAccessToken, one user can be the owner for multiple tokens at the same time, each with its own scopes and expiration. User can also revoke the tokens individually. This differentiates PersonalAccessToken from PasswordAuthentication.
+
+Consider the following different use cases:
+- PasswordAuthentication: log in to the web UI, authenticate as the user for a session to change profile, set up billing information, or interact as a "user" (for example, posting under this user profile).
+- PersonalAccessToken: create new tokens with different scopes and expirations for each server, app, bot, API, or deployment. This allows per-integration or per-action permission isolation. PersonalAccessToken would be especially good for dev (and this is why GitHub implements it) because of its environment isolation and separation.
 
 ## GitHub page suggestions
-- Avoid terms like "personal access tokens are like passwords" (which were mentioned several times through out the article). Focus on describing the concept of personal access tokens.
-- Add a comparison section at the bottom to list the different use cases for password authentication and personal access token (like what I did above). Focus on why GitHub uses personal access token, including elaborating on uses cases where "scope" and "expiration" are important.
-
+- Avoid terms like "personal access tokens are like passwords" (which were mentioned repeatedly throughout the article) to avoid confusion. Focus on describing the concept of personal access tokens.
+- Add a comparison section at the bottom to list the different use scenarios for password authentication and personal access token (like what I did above). Focus on why GitHub uses personal access tokens, including elaborating on use cases where "scope" and "expiration" are important.
 
 # Exercise 4: Defining familiar Concepts
-
-## URL Shortener
-Define a concept for the essential function of a URL shortening service such as tinyurl.com or bit.ly. Your concept should support both user-defined and autogenerated URL suffixes.
-
-**concept** UrlShortener [User, Item]
-
-**purpose** provide short aliases that redirect to long target URLs for convenience
-
-**principle**
-    user chooses a suffix or asking the system to generate one,
-    the system ensures the suffix is unique for the domain and returns the short link,
-    user navigates to the long target URL's location by clicking on the short link,
-    user can deactivate the link so it no longer redirects
-
-**state**
-a set of Links with
-    a Domain
-    a Suffix
-    a target URL
-    an owner User
-    an active Flag
-
-**actions**
-
-createCustom (owner: User, domain: Domain, suffix: Suffix, target: URL) : (link: Link)
-    requires no link exists with the same (domain, suffix) pair
-    effects create a new link with this owner, domain, suffix, and target, and set active to true
-
-createAuto (owner: User, domain: Domain, target: URL): (link: Link)
-    effects
-        autogenerate a fresh suffix not used this is domain,
-        create a new link with this owner, domain, autogenerated suffix, and target, and set active to true
-
-redirect (domain: Domain, suffix: Suffix) : (target: URL)
-    requires exist a link with matching (domain, suffix) pair and has active set as true
-    effects return the target
-
-deactivate (owner: User, link: Link)
-    requires
-        link exists
-        the owner of this link matches the provided owner
-        this link is active
-    effects
-        make active false for this link
-
-The key invariant for the state is there is at most one link per (domain, suffix) pair. The base case (when there is an empty set of Links) is trivial and holds the invariant. We preserve the invariant by:
-
-1. Having a requires statement for `createCustom` that forbids creating shortened URL when the custom (domain, suffix) pair is occupied
-
-2. Having `createAuto` autogenerate fresh/unoccupied suffix to prevent having colliding (domain, suffix) pair.
-
-Since we start with a good base case, and no transition/action would turn a good state into a bad state, the invariant is preserved.
 
 ## Conference Room Booking
 
@@ -389,7 +344,57 @@ First, each session has an optional `plannedEnd` time, which the employee can se
 
 Additionally, to differentiate between manually-ended and auto-ended sessions, each session as an `autoEnded` flag, which is true if the session is automatically ended. This information would be helpful when companies are using the tracked record to decide billing.
 
+## URL Shortener
+Define a concept for the essential function of a URL shortening service such as tinyurl.com or bit.ly. Your concept should support both user-defined and autogenerated URL suffixes.
 
+**concept** UrlShortener [User, Item]
+
+**purpose** provide short aliases that redirect to long target URLs for convenience
+
+**principle**
+    user chooses a suffix or asking the system to generate one,
+    the system ensures the suffix is unique for the domain and returns the short link,
+    user navigates to the long target URL's location by clicking on the short link,
+    user can deactivate the link so it no longer redirects
+
+**state**
+a set of Links with
+    a Domain
+    a Suffix
+    a target URL
+    an owner User
+    an active Flag
+
+**actions**
+
+createCustom (owner: User, domain: Domain, suffix: Suffix, target: URL) : (link: Link)
+    requires no link exists with the same (domain, suffix) pair
+    effects create a new link with this owner, domain, suffix, and target, and set active to true
+
+createAuto (owner: User, domain: Domain, target: URL): (link: Link)
+    effects
+        autogenerate a fresh suffix not used this is domain,
+        create a new link with this owner, domain, autogenerated suffix, and target, and set active to true
+
+redirect (domain: Domain, suffix: Suffix) : (target: URL)
+    requires exist a link with matching (domain, suffix) pair and has active set as true
+    effects return the target
+
+deactivate (owner: User, link: Link)
+    requires
+        link exists
+        the owner of this link matches the provided owner
+        this link is active
+    effects
+        make active false for this link
+
+The key invariant for the state is there is at most one link per (domain, suffix) pair. The base case (when there is an empty set of Links) is trivial and holds the invariant. We preserve the invariant by:
+
+1. Having a requires statement for `createCustom` that forbids creating shortened URL when the custom (domain, suffix) pair is occupied
+
+2. Having `createAuto` autogenerate fresh/unoccupied suffix to prevent having colliding (domain, suffix) pair.
+
+Since we start with a good base case, and no transition/action would turn a good state into a bad state, the invariant is preserved.
 
 
 
