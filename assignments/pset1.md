@@ -288,64 +288,75 @@ It is also worth noticing that admins are special users in charge of maintaining
 
 ## Billable Hours Tracking
 
-**concept** BillableHoursTracking [User, Item]
+```
+concept BillableHoursTracking [User, Item]
 
-**purpose** record billable work sessions per employee per project
+purpose Record billable work sessions per employee per project
 
-**principle**
-    an employee starts a session by choosing a project and entering a short work description;
+principle
+    an employee starts a work session by choosing a project and entering a short work description;
     later this employee ends this session;
-    if a session exceeds its  (if any) plannedEnd time or some default endDuration after start, the system automatically ends the session and marks it as auto-ended
+    if a session exceeds its plannedEnd time (if set) or some default endDuration after start, the system automatically ends the session and marks it as auto-ended
 
-**state**
-
+state
     a set of Sessions with
-        an Employee
-        a Project
-        a start Time
-        an end Time (optional)
+        an employee Employee
+        a project Project
+        a startTime Time
+        an endTime Time (optional until the session has ended)
         a plannedEnd Time (optional)
         a description String
         an autoEnded Flag
-
-    a endDuration Duration
-
-**actions**
-
-    startSession (employee: Employee, project: Project, description: String, start: Time, plannedEnd: optional Time): (session: Session)
-        **requires**
-            no session exists for this employee with the same (project, start)
-        **effects**
-            create a new session $s$ with this employee, project, start, description
-            set end for $s$ as None and autoEnded as false
-            if plannedEnd is provided, set plannedEnd
-            
-
-    endSession (employee: Employee, session: Session, end: Time):
-        **requires**
-            session exists with this employee and has end as None
-            input end is after session's start
-        **effects** set session's end as this input end
     
-    autoEnd (session: Session, current: Time):
-        **requires**
-            session exists
-            session has end as None
-            current is after session.start
-            (
-                (session.plannedEnd is present and current is after session.plannedEnd)
-                OR
-                (current is over endDuration after session.start)
-            )
-        **effects**
-            set end for the session as current
-            set autoEnded as True
+    a set of Projects with
+        a projectId String    // this projectId serves as a unique identifier
+    
+    a set of Employees with
+        an employeeId String    // this employeeId serves as a unique identifier
 
+    a endDuration Duration     // this is the default cutoff time for sessions
+
+actions
+    startSession (employee: Employee, project: Project, description: String, startTime: Time, plannedEnd: optional Time): (session: Session)
+        requires:
+            employee and project exist, and
+            no session exists for this employee with the same (project, startTime) pair
+        effects:
+            create a new session with the given employee, project, startTime, description,
+            set endTime for this session as None and autoEnded as false,
+            if plannedEnd is provided, set as the given plannedEnd
+            
+    endSession (employee: Employee, session: Session, endTime: Time):
+        requires:
+            employee exists, and
+            session exists with this employee and has endTime as None, and
+            the given endTime is after session's startTime
+        effects: set session's endTime as the given endTime
+    
+    autoEnd (session: Session, currentTime: Time):
+        requires
+            session exists, and
+            session has end as None, and
+            currentTime is after session.startTime, and
+            (
+                (session.plannedEnd is defined and currentTime is later than session.plannedEnd)
+                OR
+                (currentTime is later than session.startTime + endDuration)
+            )
+        effects:
+            set endTime for the session as currentTime
+            set autoEnded for the session as True
+```
+
+### Notes
 I have implemented several states and actions to handle a case in which someone forgets to end a session.
 
-First, each session has an optional `plannedEnd` time, which the employee can set when they perform `startSession` action. The system will automatically end any session that exceeds its plannedEnd time . If no plannedEnd is set for a session, the system will automatically end the session if it exceeds the system's `endDuration`. Therefore, no session will last longer than `endDuration`.
+First, each session has an optional `plannedEnd` time, which the employee can set when they perform `startSession` action. The system will automatically end any session that exceeds its plannedEnd time. If no plannedEnd is set for a session, the system will automatically end the session if it takes longer than the system's `endDuration`. Therefore, no session will last longer than `endDuration`.
 
-Additionally, to differentiate between manually-ended and auto-ended sessions, each session as an `autoEnded` flag, which is true if the session is automatically ended. This information would be helpful when companies are using the tracked record to decide billing.
+Additionally, to differentiate between manually-ended and auto-ended sessions, each session has an `autoEnded` flag, which is true if the session is automatically ended. This information would be helpful when companies are using the tracked record to decide billing.
+
+Companies can calculate the work duration for each session with duration = endTime - startTime.
+
 
 ## URL Shortener
 Define a concept for the essential function of a URL shortening service such as tinyurl.com or bit.ly. Your concept should support both user-defined and autogenerated URL suffixes.
