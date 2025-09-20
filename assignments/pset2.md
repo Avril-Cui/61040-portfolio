@@ -30,7 +30,7 @@ It is much easier to remember, say, and type shortened URL with dictionary words
 ### Disadvantage
 There is a limited number of short and common dictionary words. If the system runs out of short and simple words, it could use long, complex words (e.g., sesquipedalian). These words can be difficulty to read out, type out, or remember exactly.
 
-# NonceGeneration modification
+### NonceGeneration modification
 We modify NonceGeneration to realize this idea.
 
 ```
@@ -96,3 +96,193 @@ sync expireShortUrl
     then UrlShortening.delete (shortUrl: resource)
 ```
 <!-- because ExpiringResource.setExpiry is a system action performed spontaneously when its precondition is true.  -->
+
+
+# Extending the design
+We first define some additional concepts.
+## ShortUrlOwnership 
+
+```
+concept: ShortUrlOwnership [User, shortUrl]
+
+purpose:
+    record which user registered each short URL
+
+principle:
+    after a short URL is registered, its owner is set as the user who registered it
+
+state:
+    a set of Ownerships with
+        a shortUrl
+        an owner User
+
+actions
+    assign(shortUrl: shortUrl, owner: User)
+        requires: no ownership exists for shortUrl
+        effect: records owner for shortUrl
+
+    getOwner(shortUrl: shortUrl): (owner: User)
+        requires: ownership exists for shortUrl
+        effect: returns the owner
+    
+    authorize(hortUrl: shortUrl, user: User):
+        requires: ownership exists for shortUrl and user matches the owner
+        effect: approves authorization
+```
+
+## AnalyticsCounts
+```
+concept: AnalyticsCounts [shortUrl]
+
+purpose:
+    provide analytics to track how many times each URL is accessed
+
+principle:
+    after initializing a counter for a short URL, each successful redirection of that short URL to its target increase its count
+
+state
+    a set of Counters with
+        a shortURL
+        a count Number
+    
+actions
+    initCount(shortUrl: shortUrl)
+        requires: no counter exists for shortUrl
+        effect: creates a counter for shortUrl with count = 0
+    
+    increment(shortUrl: shortUrl)
+        requires: counter exists for shortUrl
+        effect: increase count by 1
+    
+    getCount(shortUrl: shortUrl): (count: Number)
+        requires: counter exists for shortUrl
+        effect: return the current count
+```
+
+Next, we specify three important synchronizations with the new concepts.
+
+Specify three essential synchronizations with your new concepts: one that happens when shortenings are created; one when shortenings are translated to targets; and one when a user examines analytics.
+
+### When shortening are created
+```
+sync initAnalytics
+
+when:
+    Request.shortenUrl(targetUrl, shortUrlBase, user)
+    NonceGeneration.generate (): (nonce)
+    UrlShortening.register (shortUrlSuffice: nonce, shortUrlBase, targetUrl): (shortUrl)
+
+then:
+    // assign the ownership of the shortUrl
+    ShortUrlOwnerShip.assign (shortUrl, owner: user)
+    // init the counter of the shortUrl
+    AnalyticsCounts.initCount (shortUrl)
+```
+
+### When shortening are translated to targets
+// check this one to see where to get shortUrl (request?)
+```
+sync recordAccess
+
+when:
+    Request.accessShortUrl (shortUrl)
+    UrlShortening.lookup (shortUrl): (targetUrl)
+
+then:
+    AnalyticsCounts.increment (shortUrl)
+```
+
+### When a user examines analytics
+```
+sync viewAnalytics
+
+when:
+    Request.viewAnalytics (shortUrl, user)
+    ShortUrlOwnership.authorize(shortUrl, user)
+
+then:
+    AnalyticsCounts.getCount(shortUrl): (count)
+```
+
+Finally, we outline how each feature requests will get realized.
+
+### Allowing users to choose their own short URLs
+We can achieve this by adding a new `registerCustom` sync, and a new action `verifySuffix` under NonceGeneration.
+
+```
+// in NonceGeneration
+
+actions
+    customSuffix (context: Context, nonce: String)
+        requires: nonce is not already used by this context
+        effects: passes verification and add nonce to context
+```
+
+```
+sync registerCustom
+
+when:
+    Request.shortenUrlCustomSuffix (targetUrl, shortUrlBase, shortUrlSuffix, user)
+    NonceGeneration.verifySuffix (context: shortUrlBase, nonce: shortUrlSuffix)
+
+then:
+    UrlShortening.register (shortUrlSuffix, shortUrlBase, targetUrl): (shortUrl)
+    ShortUrlOwnership.assign(shortUrl, owner: user)
+    AnalyticsCounts.initCount(shortUrl)
+```
+
+<!-- We can achieve this by adding a new `registerCustom` action under UrlShortening. 
+
+```
+// in UrlShortening
+actions
+    registerCustom (shortUrlBase, )
+
+``` -->
+
+## Using the “word as nonce” strategy to generate more memorable short URLs
+We generate a new concept called `WordNonceGeneration`, like how we specify it in Part 1 previously:
+
+```
+concept WordNonceGeneration [Context, Dictionary]
+purpose
+    generate unique string of a dictionary word within a context
+principle
+    each generate returns a word or word phrase not returned before for that context
+state
+a set of Contexts with
+    a used set of Strings
+    a dictionary Dictionary
+actions
+    generate (context: Context) : (nonce: String)
+        requires: exists at least one unused phrase in the dictionary
+        effect: returns a word from the dictionary that is not already used by this context
+```
+
+Now, we can have syncs `generateMemorable` and `registerMemorable` for more memorable short URLs:
+
+```
+sync generateMemorable
+
+when:
+    Request.shortenUrlMemorable(targetUrl, shortUrlBase)
+
+then:
+    WordNonceGeneration.generate(context: shortUrlBase)
+
+
+sync registerMemorable
+
+when:
+    Request.shortenUrlMemorable(targetUrl, shortUrlBase, user)
+    WordNonceGeneration.generate(): (nonce)
+
+then:
+    UrlShortening.register(shortUrlSuffix: nonce, shortUrlBase, targetUrl): (shortUrl)
+    ShortUrlOwnership.assign(shortUrl, owner: user)
+    AnalyticsCounts.initCount(shortUrl)
+```
+
+## Including the target URL in analytics
+Including the target URL in analytics, so that lookups of different short URLs can be grouped together when they refer to the same target URL;
+
