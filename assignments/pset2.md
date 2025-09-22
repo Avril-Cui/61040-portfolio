@@ -172,7 +172,7 @@ Next, we specify three important synchronizations with the new concepts.
 sync initAnalytics
 
 when:
-    Request.shortenUrl(user)
+    Request.signIn(user) // i.e., we need some way to know who's the current user
     UrlShortening.register (): (shortUrl)
 
 then:
