@@ -62,7 +62,7 @@ actions
 # Part Two: Synchronizations for URL Shortening
 
 ## 1. Partial matching
-In the `generate` sync, its purpose is to ask NonceGeneration to make a unique nonce in the given context. Therefore, the only argument needed to generate this nonce is the shortUrlBase, which will be the context. The targetUrl isn't used in NonceGeneration at all, so it is irrelevant and is omitted to preserve the separation of concerns.
+In the `generate` sync, its purpose is to generate a unique nonce in the given context. Therefore, the only argument needed to generate this nonce is the shortUrlBase, which will be the context. The targetUrl isn't used in NonceGeneration at all, so it is irrelevant to the sync and is omitted to preserve the separation of concerns.
 
 In the `register` sync, our purpose is to register a shortenUrl given a shortUrlBase and a shortUrlSuffix (nonce), and associate this shortenURL with a targetUrl. So, we need the full set of information for registration, which is why we need both the shortUrlBase and targetUrl in the request.
 
