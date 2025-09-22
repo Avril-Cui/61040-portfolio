@@ -12,7 +12,7 @@ It is necessary for NonceGeneration to store sets of used strings because the co
 A simple implementation could just be maintaining a counter for each context that starts at 0 and increments with each `generate` call. The counter acts as the way to "remember the set of used strings in this context," thus preserving the invariant. The abstraction function is as follows:
 
 1. Suppose for each context $C$, we have `counter[C]` storing the integer count for the implementation for context $C$.
-2. The abstraction function maps this counter to the set of used strings as as: $AF(counter[C])=${$encode(i)\ |\ 0\leq i< counter[C]$ }, where `encode(i)` is some function that turns an integer into a string.
+2. The abstraction function maps this counter to the set of used strings as as: $AF(counter[C])=$ { $encode(i)\ |\ 0\leq i< counter[C]$ }, where `encode(i)` is some function that turns an integer into a string.
     - A simple example of `encode(i)` is the function that converts an integer to its string form, i.e., mapping $0\to$ "0", $1\to$ "1", ...
 
  <!-- Each time when the system is asked to generate a new nonce (i.e., when `generate` is called), it will:
