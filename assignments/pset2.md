@@ -242,9 +242,9 @@ purpose
 principle
     each generate returns a dictionary word not returned before for that context
 state
-a set of Contexts with
-    a used set of Strings
-    a dictionary Dictionary
+    a set of Contexts with
+        a used set of Strings
+        a dictionary Dictionary
 actions
     generate (context: Context) : (nonce: String)
         requires: exists at least one word in the dictionary that is not included in the used set of Strings
