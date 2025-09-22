@@ -3,7 +3,7 @@
 The contexts in the NonceGeneration concept is used to define which scope we are requiring uniqueness for. In particular, instead of requiring every generated string/nonce to be unique across the entire system, uniqueness only needs to hold within a given context.
 
 In an URL shortening app, a context will be a domain or a base URL under which the shortened links are created. For example:
-- Within tinyurl.com, all suffixes/nonces must be unique. We cannot have two tinyurl.com/abc
+- Within tinyurl.com (a context), all suffixes/nonces must be unique. We cannot have two tinyurl.com/abc
 - The same suffix/nonce (/abc) can exist under two contexts without conflict. We can have both tinyurl.com/abc and mydomain.com/abc, because they are under different domains.
 
 ## 2. Storing using strings
@@ -26,10 +26,12 @@ A simple implementation could just be maintaining a counter for each context tha
 ## 3. Words as nonces
 From the perspective of the user:
 ### Advantage
-It is much easier to remember, read, share, and type shortened URL with dictionary words as suffixes. Usually, people want to shorten URL so that they can share this link with others more easily.
+It is much easier to remember, read, share, and type shortened URL with dictionary words as suffixes. Usually, people want to shorten URL so that they can share and access this link more easily.
 
 ### Disadvantage
-There is a limited number of short and common dictionary words. Therefore, it is very likely for collision to happen, meaning the same suffix will be generated twice for different targetUrls, which is misleading and could cause conflicts when users try to navigate to their targetUrl with the shortened URL (i.e., the shorten URL might redirect the user to the wrong target URL).
+There is a limited number of short and common dictionary words. Very quickly (especially if the URL shortening app is used by many people), the system will run out of words, and the URL shortening app will no longer work for users. So there is a very limited amount of generations users can request, leading to inconveniences and a bad user experience.
+
+ <!-- meaning the same suffix will be generated twice for different targetUrls, which is misleading and could cause conflicts when users try to navigate to their targetUrl with the shortened URL (i.e., the shorten URL might redirect the user to the wrong target URL). -->
 
 Also, if the system runs out of short and simple words, and to avoid collision, it could start using longer, more complex words (e.g., sesquipedalian). These words can be difficulty to read out, type out, or remember exactly.
 
@@ -48,12 +50,12 @@ principle
 state
     a set of Contexts with
         a used set of Strings
-        a dictionary Dictionary
+        a dictionary Dictionary // i.e., a set of common dictionary words
     
 actions
     generate (context: Context) : (nonce: String)
         requires: exists at least one word in the dictionary that is not included in the used set of Strings
-        effect: returns a word from the dictionary that is not already used by this context
+        effect: returns a word from the dictionary that is not already used by this context, and add this word to the used set of Strings
 ```
 
 # Part Two: Synchronizations for URL Shortening
