@@ -269,20 +269,16 @@ then:
     AnalyticsCounts.initCount (resource: targetUrl)
 
 sync recordTargetUrlAccess
-
 when:
     Request.accessShortUrl (shortUrl)
     UrlShortening.lookup (shortUrl): (targetUrl)
-
 then:
     AnalyticsCounts.increment (resource: targetUrl)
 
 
 sync viewTargetUrlAnalytics
-
 when:
     Request.viewAnalytics (targetUrl)
-
 then:
     AnalyticsCounts.getCount(resource: targetUrl): (count)
 ```
