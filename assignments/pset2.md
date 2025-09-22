@@ -187,7 +187,6 @@ then:
 sync recordAccess
 
 when:
-    Request.accessShortUrl (shortUrl)
     UrlShortening.lookup (shortUrl)
 
 then:
