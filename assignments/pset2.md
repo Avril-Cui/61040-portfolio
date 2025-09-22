@@ -262,6 +262,7 @@ The way we set up `AnalyticsCounts` concept is very generic and follows the guid
 ```
 sync initTargetUrlAnalytics
 when:
+    Request.shortenUrl(targetUrl)
     Request.signIn(user) // get the current user
     UrlShortening.register (): (shortUrl)
 then:
