@@ -101,98 +101,96 @@ sync expireShortUrl
     then UrlShortening.delete (shortUrl: resource)
 ```
 
-# Extending the design
+# Part Three: Extending the design
+## 1. Additional Concepts
 We first define some additional concepts.
-## ShortUrlOwnership 
 
+### ShortUrlOwnership 
 ```
-concept: ShortUrlOwnership [User, shortUrl]
+concept: ShortUrlOwnership [User]
 
 purpose:
-    record which user registered each short URL
+    record which user registered each resource
 
 principle:
-    after a short URL is registered, its owner is set as the user who registered it
+    after a resource is registered, its owner is the user who registered it, and only that user can access or change that resource
 
 state:
     a set of Ownerships with
-        a shortUrl
+        a resource Resource
         an owner User
 
 actions
-    assign(shortUrl: shortUrl, owner: User)
-        requires: no ownership exists for shortUrl
-        effect: records owner for shortUrl
+    assign(resource: Resource, owner: User)
+        requires: no ownership exists for resource
+        effect: records ownership to associate resource with owner
 
-    getOwner(shortUrl: shortUrl): (owner: User)
-        requires: ownership exists for shortUrl
-        effect: returns the owner
+    getOwner(resource: Resource): (owner: User)
+        requires: ownership exists for resource
+        effect: returns the owner of the given resource
     
-    authorize(hortUrl: shortUrl, user: User):
-        requires: ownership exists for shortUrl and user matches the owner
-        effect: approves authorization
+    authorize(resource: Resource, user: User): (verified: Boolean)
+        requires: ownership exists for resource and owner matches the given user
+        effect: approves authorization, return verified as True
 ```
 
-## AnalyticsCounts
+### AnalyticsCounts
 ```
-concept: AnalyticsCounts [shortUrl]
+concept: AnalyticsCounts [Resource]
 
 purpose:
-    provide analytics to track how many times each URL is accessed
+    provide analytics to track how many times each resource is accessed
 
 principle:
-    after initializing a counter for a short URL, each successful redirection of that short URL to its target increase its count
+    after initializing a counter for a resource, each successful access to this resource increase its count
 
 state
     a set of Counters with
-        a shortURL
+        a resource Resource
         a count Number
     
 actions
-    initCount(shortUrl: shortUrl)
-        requires: no counter exists for shortUrl
-        effect: creates a counter for shortUrl with count = 0
+    initCount(resource: Resource)
+        requires: no counter exists for resource
+        effect: creates a counter for resource with count = 0
     
-    increment(shortUrl: shortUrl)
-        requires: counter exists for shortUrl
-        effect: increase count by 1
+    increment(resource: Resource)
+        requires: counter exists for resource
+        effect: increase count of resource by 1
     
-    getCount(shortUrl: shortUrl): (count: Number)
-        requires: counter exists for shortUrl
-        effect: return the current count
+    getCount(resource: Resource): (count: Number)
+        requires: counter exists for resource
+        effect: return the current count for the resource
 ```
 
+## Synchronizations
 Next, we specify three important synchronizations with the new concepts.
-
-Specify three essential synchronizations with your new concepts: one that happens when shortenings are created; one when shortenings are translated to targets; and one when a user examines analytics.
 
 ### When shortening are created
 ```
 sync initAnalytics
 
 when:
-    Request.shortenUrl(targetUrl, shortUrlBase, user)
-    NonceGeneration.generate (): (nonce)
-    UrlShortening.register (shortUrlSuffice: nonce, shortUrlBase, targetUrl): (shortUrl)
+    Request.shortenUrl(user)
+    UrlShortening.register (): (shortUrl)
 
 then:
     // assign the ownership of the shortUrl
-    ShortUrlOwnerShip.assign (shortUrl, owner: user)
+    ShortUrlOwnerShip.assign (resource: shortUrl, owner: user)
     // init the counter of the shortUrl
-    AnalyticsCounts.initCount (shortUrl)
+    AnalyticsCounts.initCount (resource: shortUrl)
 ```
 
 ### When shortening are translated to targets
-// check this one to see where to get shortUrl (request?)
 ```
 sync recordAccess
 
 when:
     Request.accessShortUrl (shortUrl)
-    UrlShortening.lookup (shortUrl): (targetUrl)
+    UrlShortening.lookup (shortUrl)
 
 then:
-    AnalyticsCounts.increment (shortUrl)
+    AnalyticsCounts.increment (resource: shortUrl)
 ```
 
 ### When a user examines analytics
@@ -201,24 +199,25 @@ sync viewAnalytics
 
 when:
     Request.viewAnalytics (shortUrl, user)
-    ShortUrlOwnership.authorize(shortUrl, user)
+    ShortUrlOwnership.authorize(resource: shortUrl, user) : (verified)
+        requires: verified is True
 
 then:
-    AnalyticsCounts.getCount(shortUrl): (count)
+    AnalyticsCounts.getCount(resource: shortUrl): (count)
 ```
 
+## Additional features
 Finally, we outline how each feature requests will get realized.
 
 ### Allowing users to choose their own short URLs
-We can achieve this by adding a new `registerCustom` sync, and a new action `verifySuffix` under NonceGeneration.
-
+We can achieve this by adding a new `registerCustom` sync, and a new action `customSuffix` under NonceGeneration to validate the user-inputted nonce before registration:
 ```
 // in NonceGeneration
 
 actions
-    customSuffix (context: Context, nonce: String)
+    customSuffix (context: Context, nonce: String): (verified: Boolean)
         requires: nonce is not already used by this context
-        effects: passes verification and add nonce to context
+        effects: passes verification, add nonce to context, return verified as True
 ```
 
 ```
@@ -226,22 +225,12 @@ sync registerCustom
 
 when:
     Request.shortenUrlCustomSuffix (targetUrl, shortUrlBase, shortUrlSuffix, user)
-    NonceGeneration.verifySuffix (context: shortUrlBase, nonce: shortUrlSuffix)
+    NonceGeneration.customSuffix (context: shortUrlBase, nonce: shortUrlSuffix) : (verified)
+        requires: verified is True
 
 then:
-    UrlShortening.register (shortUrlSuffix, shortUrlBase, targetUrl): (shortUrl)
-    ShortUrlOwnership.assign(shortUrl, owner: user)
-    AnalyticsCounts.initCount(shortUrl)
+    UrlShortening.register (shortUrlSuffix, shortUrlBase, targetUrl)
 ```
-
-<!-- We can achieve this by adding a new `registerCustom` action under UrlShortening. 
-
-```
-// in UrlShortening
-actions
-    registerCustom (shortUrlBase, )
-
-``` -->
 
 ## Using the “word as nonce” strategy to generate more memorable short URLs
 We generate a new concept called `WordNonceGeneration`, like how we specify it in Part 1 previously:
@@ -251,150 +240,60 @@ concept WordNonceGeneration [Context, Dictionary]
 purpose
     generate unique string of a dictionary word within a context
 principle
-    each generate returns a word or word phrase not returned before for that context
+    each generate returns a dictionary word not returned before for that context
 state
 a set of Contexts with
     a used set of Strings
     a dictionary Dictionary
 actions
     generate (context: Context) : (nonce: String)
-        requires: exists at least one unused phrase in the dictionary
-        effect: returns a word from the dictionary that is not already used by this context
+        requires: exists at least one word in the dictionary that is not included in the used set of Strings
+        effect: returns a word from the dictionary that is not already used by this context, and add this word to the used set of Strings
 ```
 
-Now, we can have syncs `generateMemorable` and `registerMemorable` for more memorable short URLs:
+Now, we can have syncs `generateMemorable` and `registerMemorable` for more memorable short URLs. They are essentially the same syncs as `generate` and `register` syncs, but we replace NonceGeneration.generate with WordNonceGeneration.generate to support "word as nonce" strategy. We also 
 
-```
-sync generateMemorable
+However, this feature has its own advantage and disadvantage, as described in Part 1. So, this feature may not always be desirable.
 
-when:
-    Request.shortenUrlMemorable(targetUrl, shortUrlBase)
-
-then:
-    WordNonceGeneration.generate(context: shortUrlBase)
-
-
-sync registerMemorable
-
-when:
-    Request.shortenUrlMemorable(targetUrl, shortUrlBase, user)
-    WordNonceGeneration.generate(): (nonce)
-
-then:
-    UrlShortening.register(shortUrlSuffix: nonce, shortUrlBase, targetUrl): (shortUrl)
-    ShortUrlOwnership.assign(shortUrl, owner: user)
-    AnalyticsCounts.initCount(shortUrl)
-```
 
 ## Including the target URL in analytics
-Including the target URL in analytics, so that lookups of different short URLs can be grouped together when they refer to the same target URL;
-
-For the purpose of separation of concerns, we create an TargetAnalyticsCounts concept, which is the same as AnalyticsCount, but instead of having a shortUrl and a count under Counters, we have a targetUrl and a count under the set of Counters:
-```
-concept: TargetAnalyticsCounts [TargetUrl]
-
-purpose:
-    provide analytics to track how many times each URL is accessed
-
-principle:
-    after initializing a counter for a short URL, each successful redirection of that short URL to its target increase its count
-
-state
-    a set of Counters with
-        a targetUrl TargetUrl
-        a count Number
-    
-actions
-    initCount(targetUrl: TargetUrl)
-        requires: no counter exists for targetUrl
-        effect: creates a counter for targetUrl with count = 0
-    
-    increment(targetUrl: TargetUrl)
-        requires: counter exists for targetUrl
-        effect: increase count by 1
-    
-    getCount(targetUrl: TargetUrl): (count: Number)
-        requires: counter exists for targetUrl
-        effect: return the current count
-```
-
-Then, we add a sync with `UrlShortening.register` to initialize the targetUrl counter if the target does not have a counter yet, a sync with `UrlShortening.lookup` to increment the count of the ShortUrl and the targetUrl.
+The way we set up `AnalyticsCounts` concept is very generic and follows the guideline of separation of concerns. Therefore, it is very simple to include target URL in analytics. We simply add three new syncs for target URL analytics:
 
 ```
-sync initAnalytics
-
+sync initTargetUrlAnalytics
 when:
-    Request.shortenUrl(targetUrl, shortUrlBase, user)
-    NonceGeneration.generate (): (nonce)
-    UrlShortening.register (shortUrlSuffice: nonce, shortUrlBase, targetUrl): (shortUrl)
-
+    Request.shortenUrl(targetUrl, user)
+    UrlShortening.register (): (shortUrl)
 then:
-    // assign the ownership of the shortUrl
-    ShortUrlOwnerShip.assign (shortUrl, owner: user)
-    // init the counter of the shortUrl
-    AnalyticsCounts.initCount (shortUrl)
-    // init the counter of the baseUrl (the precondition will check if the targetUrl already has a counter)
-    TargetAnalyticsCounts.initCount (targetUrl)
+    // init the counter of the targetUrl
+    AnalyticsCounts.initCount (resource: targetUrl)
 
-
-sync recordAccess
+sync recordTargetUrlAccess
 
 when:
     Request.accessShortUrl (shortUrl)
     UrlShortening.lookup (shortUrl): (targetUrl)
 
 then:
-    AnalyticsCounts.increment (shortUrl)
-    TargetAnalyticsCounts.increment (targetUrl)
+    AnalyticsCounts.increment (resource: targetUrl)
 
 
-sync viewTargetAnalytics
+sync viewTargetUrlAnalytics
 
 when:
-    Request.viewTargetAnalytics (targetUrl)
+    Request.viewAnalytics (targetUrl)
 
 then:
-    TargetAnalyticsCounts.getCount(targetUrl): (count)
+    AnalyticsCounts.getCount(resource: targetUrl): (count)
 ```
 
-However, we can see a caveat in the `viewTargetAnalytics` sync. Different users can generate multiple shortUrls that directs to the same targetUrl. This is problematic because the prompt specified that: "Analytics should not be public but should be viewable only by the user who registered the shortening." Thus, we probably should not include this feature of viewing target URL analytics due to privacy concerns.
+However, we can see an obvious caveat in the `viewTargetUrlAnalytics` sync. Different users can generate multiple shortUrls that directs to the same targetUrl. This is problematic because the prompt related to analytics specified that: "Analytics should not be public but should be viewable only by the user who registered the shortening." Thus, we probably should not include this feature of viewing target URL analytics due to privacy concerns. We don't want users to view analytics involving other users.
 
 ## Generate short URLs that are not easily guessed
-To achieve this feature, we simply modify the `generate` action in NonceGeneration so that instead of returning any nonce that is not already used by the context, we return some secure nonce (perhaps generated by cryptographic encryption algorithms) that are not used by this context. We also see that this feature can contradict with feature 2, because it's difficult to both achieve memorable words and security for nonces.
+To achieve this feature, we simply modify the `generate` action in NonceGeneration so that instead of returning any nonce that is not already used by the context, we return some secure nonce (generated by cryptographic encryption algorithms or more random algorithms) that are not used by this context.
 
-<!-- We make the following modification of the NonceGeneration concept: -->
-<!-- ```
-concept: NonceGeneration [Context]
-
-purpose: generate unique strings within a context
-
-principle:
-    each generate returns a string not returned before for that context
-
-state:
-    a set of Contexts with
-        a used set of Strings
-    
-actions:
-    generate (context: Context) : (nonce: String)
-        effect returns a nonce that is not already used by this context
-    
-    generate (context: Context) : (nonce: String)
-        effect:
-            generates a random string of alphabets
-``` -->
+We also see that this feature can contradict with feature 2, because it's difficult to both achieve memorable words and security for nonces.
 
 ## Supporting reporting of analytics to creators of short URLs who have not registered as user
 I think this feature is undesirable and should not be included. The current analytics concept design is based on the core that "Analytics should not be public but should be viewable only by the user who registered the shortening." Letting non-registered creators view analytics weakens that privacy model and conflates identity authentication with analytics.
-
-
-
-
-
-
-
-
-
-
-
 
