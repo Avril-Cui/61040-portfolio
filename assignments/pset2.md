@@ -267,6 +267,7 @@ when:
     UrlShortening.register (): (shortUrl)
 then:
     // init the counter of the targetUrl
+    // by invariant and precondition, this will only init once
     AnalyticsCounts.initCount (resource: targetUrl)
 
 sync recordTargetUrlAccess
