@@ -34,7 +34,7 @@ There is a limited number of short and common dictionary words. Very quickly (es
 
  <!-- meaning the same suffix will be generated twice for different targetUrls, which is misleading and could cause conflicts when users try to navigate to their targetUrl with the shortened URL (i.e., the shorten URL might redirect the user to the wrong target URL). -->
 
-Also, if the system runs out of short and simple words, and to avoid collision, it could start using longer, more complex words (e.g., sesquipedalian). These words can be difficulty to read out, type out, or remember exactly.
+Also, if the system runs out of short and simple words, and to avoid collision, it could start generating longer, more complex words (e.g., sesquipedalian). These words can be difficulty to read out, type out, or remember exactly.
 
 ### NonceGeneration modification
 We modify NonceGeneration to realize this idea.
