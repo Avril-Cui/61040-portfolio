@@ -262,7 +262,7 @@ The way we set up `AnalyticsCounts` concept is very generic and follows the guid
 ```
 sync initTargetUrlAnalytics
 when:
-    Request.shortenUrl(targetUrl, user)
+    Request.signIn(user) // get the current user
     UrlShortening.register (): (shortUrl)
 then:
     // init the counter of the targetUrl
@@ -270,7 +270,6 @@ then:
 
 sync recordTargetUrlAccess
 when:
-    Request.accessShortUrl (shortUrl)
     UrlShortening.lookup (shortUrl): (targetUrl)
 then:
     AnalyticsCounts.increment (resource: targetUrl)
