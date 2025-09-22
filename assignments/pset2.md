@@ -224,7 +224,7 @@ actions
 sync registerCustom
 
 when:
-    Request.shortenUrlCustomSuffix (targetUrl, shortUrlBase, shortUrlSuffix, user)
+    Request.shortenUrlCustomSuffix (targetUrl, shortUrlBase, shortUrlSuffix)
     NonceGeneration.customSuffix (context: shortUrlBase, nonce: shortUrlSuffix) : (verified)
         requires: verified is True
 
