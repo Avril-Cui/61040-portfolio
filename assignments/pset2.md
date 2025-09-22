@@ -14,6 +14,7 @@ A simple implementation could just be maintaining a counter for each context tha
 1. Suppose for each context $C$, we have `counter[C]` storing the integer count for the implementation for context $C$.
 2. The abstraction function maps this counter to the set of used strings as as: $AF(counter[C])=$ { $encode(i)\ |\ 0\leq i< counter[C]$ }, where `encode(i)` is some function that turns an integer into a string.
     - A simple example of `encode(i)` is the function that converts an integer to its string form, i.e., mapping $0\to$ "0", $1\to$ "1", ...
+    - The set of $encode(i)$ is the set of the used strings
 
  <!-- Each time when the system is asked to generate a new nonce (i.e., when `generate` is called), it will:
 
