@@ -13,4 +13,5 @@ I really look forward to 6.1040, and hope to build some cool projects during thi
 # Table of Contents
 1. [Assignment 1: Problem Scope](assignments/assignment1.md)
 2. [Problem Set 1: Reading and Writing Concepts](assignments/pset1.md)
-2. [Problem Set 2: Composing Concepts](assignments/pset2.md)
+3. [Problem Set 2: Composing Concepts](assignments/pset2.md)
+4. [Assignment 2: Functional Design](assignments/assignment2.md)
