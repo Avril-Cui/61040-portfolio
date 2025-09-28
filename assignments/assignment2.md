@@ -50,7 +50,8 @@ Neo tackles the scheduling and productivity problems by making daily planning fl
 2. routine log
 3. adaptive schedule
 4. insight suggest
-## SchedulePlan
+
+## ScheduleTasks
 ```
 concept ScheduleTasks [User, TaskType, Slack]
 
@@ -86,10 +87,18 @@ state
         a taskIdSet containing a set of taskIds
 
 actions
+    getUserTasks (owner: User): (taskTable: a set of Tasks)
+        requires: exist at least one task with this owner
+        effect: returns a set of all tasks under this owner
+    
+    getUserSchedule (owner: User): (schedule: a set of TimeBlocks)
+        requires: exists at least one time block under this owner
+        effect: return a set of all time blocks under this owner that has end before the end of the day
+
     createTask (
         owner: User, taskName: String, category: TaskType, duration: Duration,
         timeBlockSet: set of TimeWindows, priority: Number, splittable: Flag, deadline?: TimeStamp, slack?: Slack, preDependence?: set of Tasks, note?: String
-    )
+    ): (task: Task)
         requires:
             each timeBlock in the timeBlockSet occurs before deadline (if provided)
             the latest timeBlock in any preDependence (if provided) task finishes before the earliest timeBlockSet
@@ -98,6 +107,7 @@ actions
             create a new task owned by owner with the attributes (taskId, taskName, category, duration, timeBlockSet, priority, splittable, deadline, slack, preDependence, note);
             for each timeBlock under the timeBlockSet, add this newly created task and its owner  
             add this newly created task to postDependence of all tasks in the given preDependence
+            return this newly created task
     
     addTimeBlock (owner: User, start: Time, end: Time)
         requires: no time block exists with this owner, start, and end
@@ -198,14 +208,15 @@ actions
             get the current timestamp
             set session.end = current time stamp
     
-    pauseSession(owner: User, interruptReason?: String)
+    pauseSession(owner: User, session: Session, interruptReason: String)
         requires:
             session exists and is owned by owner
         effect:
             get the current timestamp;
             set session.end = current time stamp;
             set session.isPaused = True;
-            set session.interruptReason = interruptReason if given;
+            set session.interruptReason = interruptReason;
+    
 ```
 
 ## AdaptiveSchedule
@@ -238,8 +249,102 @@ actions
         requires:
             all time blocks in plannedTimeBlocks has a start that is after the current time
         effect:
-            referencing information from tasks' attributes (priority, splittable, deadline, slack, preDependence, postDependence) and the current schedule in plannedTimeBlocks, adaptively generate a new schedule by assigning tasks to the corresponding AdaptiveBlock under this owner
+            referencing information from tasks' attributes (priority, splittable, deadline, slack, preDependence, postDependence) and the current schedule in plannedTimeBlocks, adaptively generate a new schedule by assigning active tasks to the corresponding AdaptiveBlock under this owner
 ```
+
+## Synchronizations
+1. Add new task
+2. Optimize schedule
+3. Start a session with a planned block
+4. Start a session with a new task
+5. Pause/interruption of a session
+6. complete a session
+
+### Add and remove task
+```
+sync createTask
+
+when
+    Request.addTask(user, taskName, category, duration, priority, splittable, deadline?, slack?, preDependence?)
+
+then
+    ScheduleTasks.createTask (owner: user, taskName, category, duration, priority, splittable, deadline?, slack?, preDependence?)
+```
+
+```
+sync scheduleTask
+
+when
+    Request.addTask(start, end)
+    ScheduleTasks.createTask (): (task: Task)
+
+then
+    ScheduleTasks.assignTimeBlock(owner: user, task_id: task.task_id, start, end)
+```
+
+### Optimize schedule
+```
+sync optimizeSchedule
+
+when
+    Request.optimizeSchedule(user)
+    ScheduleTasks.getUserTasks(owner: user): (taskTable)
+        ScheduleTasks.getUserSchedule(owner: user): (schedule)
+
+then
+    createAdaptiveSchedule (owner: User, taskTable, plannedTimeBlocks: schedule)
+```
+
+### Start a session with a planned task
+```
+sync startSessionWithPlannedTask
+
+when
+    Request.startPlannedSession(user, sessionName, linkedTask)
+    RoutineLog.createSession (owner: user, sessionName, linkedTask): (session)
+
+then
+    RoutineLog.startSession (owner: user, session)
+```
+
+
+### Start a session with a new task
+```
+sync startSessionWithNewTask
+
+when
+    Request.startNewSession(user, sessionName)
+    RoutineLog.createSession (owner: user, sessionName): (session)
+
+then
+    RoutineLog.startSession (owner: user, session)
+```
+
+### Pause session
+```
+sync pauseSession
+
+when
+    Request.pauseSession(session, interruptReason)
+
+then
+    RoutineLog.pauseSession (owner: user, session, interruptReason)
+```
+
+### Complete session
+```
+sync completeSession
+
+when
+    Request.completeSession(user, session)
+
+then
+    RoutineLog.endSession(owner: user, session)
+
+```
+
+
+
 
 # UI Sketches
 There are three main pages/views in Neo: Today, Compare, and Record. I will go through the UI sketch for each, and what purposes each view serves below. Each of the UI design is annotated with pointers, and more detailed explanation are provided below the UI.
