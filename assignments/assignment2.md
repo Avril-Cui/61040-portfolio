@@ -239,7 +239,11 @@ actions
             all time blocks in plannedTimeBlocks has a start that is after the current time
         effect:
             referencing information from tasks' attributes (priority, splittable, deadline, slack, preDependence, postDependence) and the current schedule in plannedTimeBlocks, adaptively generate a new schedule by assigning tasks to the corresponding AdaptiveBlock under this owner
-
 ```
+
+# UI Sketches
+There are three main pages/views in Neo: Today, Compare, and Record. I will go through the UI sketch for each, and what purposes each view serves below. Each of the UI design is annotated with pointers, and more detailed explanation are provided below the UI.
+## View 1: Today
+![today](as2-ui/today_ui.png)
 
 
