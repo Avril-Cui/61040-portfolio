@@ -46,12 +46,137 @@ Neo tackles the scheduling and productivity problems by making daily planning fl
 3. **Smart scheduling suggestions**: drawing from previous schedules and logs on actual activities, Neo identifies time blocks or task types where Productivists are prone to procrastination and flags instances where estimated durations may be unrealistic. Neo then provides evidence-based suggestions for realistic task durations, better focus windows, and time blocks for relax or debrief, empowering users to design plans that work more efficiently in practice.
 
 # Concept design
-1. schedule plan
-2. routine log
-3. adaptive schedule
-4. insight suggest
+## TaskCatalog
+```
+concept TaskCatalog [User, TaskType, Slack]
+
+purpose
+    allows users to create tasks with different attributes that will get scheduled;
+    the attributes will be taken as input by the adaptive calendar algorithm to generate adaptive schedule;
+
+state
+    a set of Tasks with
+        an owner User
+        a taskID String
+        a taskName String
+        a category TaskType
+        a duration Duration
+        a priority Number
+        a splittable Flag
+        a timeBlockSet containing a set of Strings (optional) // these strings are timeBlockIds
+        a deadline TimeStamp (optional)
+        a slack Slack (optional) // buffer margin for acceptable deviation
+        a preDependence containing a set of Tasks (optional) // tasks that it depends on
+        a postDependence containing a set of Tasks (optional) // tasks that depend on it
+        a note String (optional)
+
+actions
+    getUserTasks (owner: User): (taskTable: a set of Tasks)
+        requires: exist at least one task with this owner
+        effect: returns ALL tasks under this owner
+    
+    createTask (
+        owner: User, taskName: String, category: TaskType, duration: Duration,
+        priority: Number, splittable: Flag, deadline?: TimeStamp, slack?: Slack, preDependence?: set of Tasks, note?: String
+    ): (task: Task)
+        effect
+            generate a new taskId that has not been used;
+            create a new task owned by owner with the attributes (taskId, taskName, category, duration, priority, splittable, deadline?, slack?, preDependence?, note?), the optional attributes are not required;
+            set this task's timeBlockSet as None;
+            add this newly created task to postDependence of all tasks in its given preDependence;
+            return this newly created task;
+    
+    assignSchedule (owner: User, taskID: String, timeBlockId: string)
+        requires:
+            exists task with matching owner and taskId
+        effect:
+            add timeBlockId to the set of timeBlockSet
+    
+    verifyTime (taskId: String, intendedStart: Time, intendedEnd: Time): (verified: Boolean)
+        requires:
+            exists task with taskId
+        effect:
+            returns True if (the latest end time of any preDependence last is before intendedStart) AND (the earliest start time of any postDependence is after intendedEnd);
+            otherwise, return False;
+    
+    updateTask (owner: User, taskId: String, taskName: String)
+    updateTask (owner: User, taskId: String, category: TaskType)
+    updateTask (owner: User, taskId: String, duration: Duration)
+    updateTask (owner: User, taskId: String, priority: Number)
+    updateTask (owner: User, taskId: String, splittable: Flag)
+    updateTask (owner: User, taskId: String, deadline: TimeStamp)
+    updateTask (owner: User, taskId: String, slack: Slack)
+    updateTask (owner: User, taskId: String, postDependence: Number)
+    updateTask (owner: User, taskId: String, preDependence: Number)
+        requires:
+            exist a task with this taskId and the owner matches the given owner
+        effect:
+            update the given attribute of this task;
+            if preDependence is changed, also modify the postDependence of related tasks;
+            if postDependence is change, also modify the preDependence of related tasks;
+    
+    deleteTask (owner: User, taskId: string)
+        requires:
+            exist a task $t$ with this taskId;
+            task $t$ has no postDependence;
+            task $t$ has a matching owner;
+        effect:
+            remove task $t$ from Tasks
+```
+
+## ScheduleTime
+```
+concept ScheduleTime [User]
+
+purpose
+    manages users' intended schedule of future tasks by allowing them to assign tasks to each time block
+
+principle
+    users can allocate tasks to one or more time blocks
+    the time blocks reflect the user's intended schedule of the day
+
+state
+    a set of TimeBlocks with
+    a timeBlockId String // this is a unique id
+    an owner User
+    a start Time
+    an end Time
+    a taskIdSet set String
+
+actions
+    getUserSchedule (owner: User): (schedule: a set of TimeBlocks)
+        requires:
+            exists at least one time block under this owner
+        effect:
+            return a set of all time blocks under this owner ending before day's end
+        
+    addTimeBlock (owner: User, start: Time, end: Time)
+        requires:
+            no time block exists with this owner, start, and end
+        effect:
+            create a new time block $b$ with this owner, start, and end, and empty taskIdSet
+    
+    assignTimeBlock (owner: User, taskId: String, start: Time, end: Time)
+        requires:
+            if exists time block b with matching (owner, start, end), then timeId is not in b.taskIdSet
+        effect:
+            if b doesn't exist, create it with owner, start, and end (same as addTimeBlock)
+            add taskId to b.taskIdSet
+    
+    removeTask (owner: User, taskId: String, timeBlockId: String)
+        requires:
+            exists a time block with matching owner and timeBlockId;
+            taskId exists in this time block's taskIdSet;
+        effect:
+            remove taskId from that block's taskIdSet
+
+```
+
+
 
 ## ScheduleTasks
+ScheduleTask is concept that captures the user's task planning and scheduling process. It manages user's planned tasks (a set of Tasks) and intended calendar schedule for these tasks (a set of TimeBlocks). 
+
 ```
 concept ScheduleTasks [User, TaskType, Slack]
 
