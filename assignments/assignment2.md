@@ -244,17 +244,52 @@ actions
 # UI Sketches
 There are three main pages/views in Neo: Today, Compare, and Record. I will go through the UI sketch for each, and what purposes each view serves below. Each of the UI design is annotated with pointers, and more detailed explanation are provided below the UI.
 ## View 1: Today
+### Show today's schedule
+This page displays a clean timeline of the user's schedule for the current day, showing tasks' schedule and progress. The key component is a timeline with tasks stacked along time slots. Each task shows priority and progress bar.
+
+This simply visualization of the daily schedule shows clear indicators of progress and priority, reducing decision fatigue.
+
 ![today](as2-ui/today_ui.png)
+
+### Add task
+The add task panel allows users to create planned tasks by entering essential information (task name, category, duration, priority, and optional settings like deadline, buffer/slack, prerequisites, and postrequisites). These information will help the algorithm to produce more optimized adaptive schedule.
 
 ![today](as2-ui/addtask_ui.png)
 
 
 ## View 2: Compare
+This page is key to Neo. It shows a side-by-side comparison of the planned schedule versus the actual routine/sessions the user recorded. It highlights perfect matches, mismatches, and unplanned tasks, and shows how the actual routine deviates from the plans.
+
+Instead of punishing users for failing to "stick to the plan" and leave them with no solution for the resulting chaos, Neo reframes deviations as learning opportunities. This page gives visibility into how real life differed from plans. Neo also offers a solution to optimize the schedule. By clicking on the "Optimize Schedule" button, Neo re-adjusts remaining tasks/plans in the day to account for deviations, helping users meeting top priorities and deadlines. Neo helps users update the day dynamically.
+
 ![compare](as2-ui/compare_ui.png)
 
 ## View 3: Record
+### Start and end session
+In the Record page, the user logs current work session in real time. The page will track how long the user spends on a chosen task, and the actual session block will be reflected in the Compare page.
+
+The goal of this page is to make it easy to record real-time sessions, reducing the friction in logging actual routines, and provide data for adaptive scheduling.
+
 ![record](as2-ui/record_ui.png)
+
+### Pause session
+Interruptions are a huge source of productivity loss. If a session is interrupted (i.e., if the user clicks "PAUSE"), the app learns *why* users go off-track and uses that insight to refine future scheduling suggestions (such as factoring in short breaks, buffer times, or ad hoc meetings). 
+
 ![record_palse_ui](as2-ui/record_palse_ui.png)
 
+# User Journey
+Jay is a Productivist. As a product manager at Microsoft, Jay balances cross-team meetings, roadmap planning, and individual focus work every day. To stay on top of everything, Jay creates detailed schedules of his daily plan in Notion Calendar, and asks his colleagues and clients to book meetings through this platform too.
 
+However, this Tuesday mid-afternoon is not the first time Jay realizes his ambitious and organized schedule of the day collapsed -- after three ad-hoc meetings (two of which run long), two urgent pings from his colleagues, and one new task from his lead. His focus work gets completely postponed, and he is uncertain whether he can still finish his tasks on time. At that moment, Jay decides to try Neo, a scheduling tool that flexes with reality, helping him navigate the overwhelming situation of planned schedules not matching the reality, making schedules more adaptive and effective.
 
+Using the [Add Task panel](#add-task), Jay quickly enters this remaining tasks for the day, including "Write Product Spec," "Team Sync," and "Review Customer Feedback." He assigned each task a priority, duration, and category, and allocates these task blocks onto the timeline. For “Write Product Spec,” Jay sets a hard deadline and allows it to be splittable across multiple sessions.
+
+On the [Today](#show-todays-schedule) page, Jay sees a simple and intuitive timeline that shows what he is expected to work on for the remainder of the day. The page shows him meetings in fixed slots, focus tasks filling open time, and color-coded priorities.
+
+When Jay begins a session on "Writing Product Spec," he opens the Record Session, chooses the "Writing Product Spec" task, and clicks on the start session button. Halfway through finishing his work, he gets interrupted by an urgent call from the engineering team. Jay pauses the session and logs the cause using the [Pause Session interface](#pause-session), selecting "Interruption — Call/Meeting." This not only pauses the timer but feeds Neo data about interruptions, helping future planning.
+
+By afternoon, Jay looks at the [compare interface](#view-2-compare) and notices that too many interruptions have piled up, and it is clear that not all of his planned tasks can be completed. Instead of scrambling or feeling overwhelmed, Jay clicks the Optimize Schedule button on the [compare page](#view-2-compare). Neo adaptively and automatically reschedules the remaining timeline, pushing non-critical tasks into tomorrow, while prioritizing hard deadlines and high-priority work for the rest of the day. Neo also learns from Jay's logged sessions through out the day, analyses his focus pattern and energy cycle, and suggests short breaks to boost Jay's overall productivity. This gives Jay confidence that the most important outcomes will still be achieved.
+
+At the end of the day, Jay revisits the [compare page](#view-2-compare). The timeline shows what matched perfectly in green, what deviated in red, and what got dynamically rescheduled in grey. Instead of feeling guilty about unfinished items, Jay sees a rationalized schedule where the most important tasks were accomplished despite interruptions.
+
+Neo reframes deviations as learning opportunities, and offers Jay insights like: “Spec writing tasks take 1.5x longer than estimated.” For Jay, this means ending the day with clarity rather than guilt. He learns about his own focus pattern, energy cycles, and work habits. Most importantly, Neo helps him finished most of his high-priority tasks. Over time, Jay builds more realistic schedules and feels more effective as a busy product manager.
