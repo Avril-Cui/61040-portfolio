@@ -1,6 +1,6 @@
 
 
-# Part One: Problem statement
+# Problem statement
 ## Problem domain: Productivity, scheduling, and planning
 I have the habit of planning out my routine ahead of time and tracking progress daily to enhance productivity. I spend a lot of time experimenting with productivity tools like Notion, calendar apps, and Trello, trying to keep my life scheduled and organized. Although many of these apps are powerful, I often find them overly complex and not tailored to my personal routine. I often spend over an hour each day updating schedules and tracking progress, making me feel inefficient about my daily workflow.
 
@@ -33,7 +33,7 @@ When I plan my daily routines, I often create highly detailed schedules packed w
 
 7. [**RescueTime Solution:**](https://www.rescuetime.com/) This is a tool that monitors focus sessions and daily activities, offering valuable logging of how time is actually spent and enabling users to reflect on their workflow. While it helps raise awareness of tasks achieved during a day and can improve focus quality over time, it does not function as an adaptive scheduler. Users must still rely on additional platforms to re-adjust and optimize their plans, which introduces extra complexity.
 
-# Application Pitch: Introducing NEO $\to$ the ONE calendar app you need
+# Application pitch: Introducing NEO $\to$ the ONE calendar app you need
 ## Motivation
 Most productivity tools force people into rigid plans that crumble the moment real life interferes, while students and professionals need not just another static planner, but a dynamic companion that learns, adjusts, and help them grow.
 
@@ -44,3 +44,109 @@ Neo tackles the scheduling and productivity problems by making daily planning fl
 2. **Schedule plans**: Productivists create tasks for future days by specifying key fields like task type, priority, deadlines, estimated duration, and flexibility (i.e., split and move booleans). Neo then translate this into a responsive plan that adjusts smoothly as real life unfolds, respecting constraints while mitigating frustrations caused by last-minute changes. 
 
 3. **Smart scheduling suggestions**: drawing from previous schedules and logs on actual activities, Neo identifies time blocks or task types where Productivists are prone to procrastination and flags instances where estimated durations may be unrealistic. Neo then provides evidence-based suggestions for realistic task durations, better focus windows, and time blocks for relax or debrief, empowering users to design plans that work more efficiently in practice.
+
+# Concept design
+1. schedule plan
+2. routine log
+3. adaptive schedule
+4. insight suggest
+## SchedulePlan
+```
+concept ScheduleTasks [User, TaskType, Slack]
+
+purpose
+    create intended schedule of future tasks with information about priority, duration, flexibility to enable adaptive schedule adjustment
+
+principle
+    after creating a task with a set of constraints, it is allocated to one or more time blocks
+    the time blocks reflect the user's intended schedule of the day
+    constraints of a task can be updated
+
+state
+    a set of Tasks with
+        an owner User
+        a taskID String
+        a taskName String
+        a category TaskType
+        a duration Duration
+        a timeBlockSet containing a set of Strings  // these strings are timeBlockIds
+        a priority Number
+        a splittable Flag
+        a deadline TimeStamp (optional)
+        a slack Slack (optional) // buffer margin for acceptable deviation
+        a preDependence containing a set of Tasks (optional) // tasks that it depends on
+        a postDependence containing a set of Tasks (optional) // tasks that depend on it
+        a note String (optional)
+    
+    a set of TimeBlocks with
+        a timeBlockId String // this is a unique id
+        an owner User
+        a start Time
+        an end Time
+        a taskIdSet containing a set of taskIds
+
+actions
+    createTask (
+        owner: User, taskName: String, category: TaskType, duration: Duration,
+        timeBlockSet: set of TimeWindows, priority: Number, splittable: Flag, deadline?: TimeStamp, slack?: Slack, preDependence?: set of Tasks, note?: String
+    ):
+        requires:
+            each timeBlock in the timeBlockSet occurs before deadline (if provided)
+            the latest timeBlock in any preDependence (if provided) task finishes before the earliest timeBlockSet
+        effect
+            generate a new taskId that has not been used
+            create a new task owned by owner with the attributes (taskId, taskName, category, duration, timeBlockSet, priority, splittable, deadline, slack, preDependence, note);
+            for each timeBlock under the timeBlockSet, add this newly created task and its owner  
+            add this newly created task to postDependence of all tasks in the given preDependence
+    
+    addTimeBlock (owner: User, start: Time, end: Time):
+        requires: no time block exists with this owner, start, and end
+        effect:
+            create a new time block $b$ with this owner, start, and end;
+            assign $b$ an empty set of tasks
+    
+    updateTask (owner: User, taskId: String, taskName: String):
+    updateTask (owner: User, taskId: String, category: TaskType):
+    updateTask (owner: User, taskId: String, duration: Duration):
+    updateTask (owner: User, taskId: String, priority: Number):
+    updateTask (owner: User, taskId: String, splittable: Flag):
+    updateTask (owner: User, taskId: String, deadline: TimeStamp):
+    updateTask (owner: User, taskId: String, slack: Slack):
+    updateTask (owner: User, taskId: String, postDependence: Number):
+    updateTask (owner: User, taskId: String, preDependence: Number):
+        requires:
+            exist a task with this taskId and the owner matches the given owner
+        effect:
+            update the given attribute of this task
+            if timeBlockSet is updated, also update the timeBlocks containing this task
+            if preDependence is changed, also modified the postDependence of related tasks
+    
+    
+    assignTimeBlock (owner: User, taskId: String, start, end):
+        requires:
+            exist a task with this taskId and the owner matches the given owner
+            under the timeBlock with matching (owner, start, end), taskId doesn't exist in this timeBlock's taskIdSet
+            
+        effect:
+            if no timeBlock exists with this owner, start, and end, create a new timeBlock $b$ with this owner, start, and end, and assign $b$ an empty set of tasks;
+            add the task's taskIds to timeBlockSet under the timeBlock with matching (owner, start, end)
+            add this timeBlock's timeBlockId to this task's timeBlockSet
+    
+    removeTimeBlock (owner: User, taskId: String, timeBlockId: String):
+        requires:
+            exist a task with this taskId;
+            for this task, exists a timeBlockSet that contains the given timeBlockId;
+            exist a timeBlock with matching timeBlockId and owner;
+        effect:
+            remove timeBlockId from the task's timeBlockSet;
+            remove the task's taskId from the timeBlock's taskIdSet 
+            
+    deleteTask (owner: User, taskId: String):
+        requires:
+            exist a task $t$ with this taskId;
+            task $t$ has no postDependence;
+            task $t$ has a matching owner;
+        effect:
+            remove task $t$ from Tasks
+            for all timeBlocks containing tasks $t$, remove $t$'s taskId from their taskIdSet
+```
