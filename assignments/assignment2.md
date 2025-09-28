@@ -89,7 +89,7 @@ actions
     createTask (
         owner: User, taskName: String, category: TaskType, duration: Duration,
         timeBlockSet: set of TimeWindows, priority: Number, splittable: Flag, deadline?: TimeStamp, slack?: Slack, preDependence?: set of Tasks, note?: String
-    ):
+    )
         requires:
             each timeBlock in the timeBlockSet occurs before deadline (if provided)
             the latest timeBlock in any preDependence (if provided) task finishes before the earliest timeBlockSet
@@ -99,21 +99,21 @@ actions
             for each timeBlock under the timeBlockSet, add this newly created task and its owner  
             add this newly created task to postDependence of all tasks in the given preDependence
     
-    addTimeBlock (owner: User, start: Time, end: Time):
+    addTimeBlock (owner: User, start: Time, end: Time)
         requires: no time block exists with this owner, start, and end
         effect:
             create a new time block $b$ with this owner, start, and end;
             assign $b$ an empty set of tasks
     
-    updateTask (owner: User, taskId: String, taskName: String):
-    updateTask (owner: User, taskId: String, category: TaskType):
-    updateTask (owner: User, taskId: String, duration: Duration):
-    updateTask (owner: User, taskId: String, priority: Number):
-    updateTask (owner: User, taskId: String, splittable: Flag):
-    updateTask (owner: User, taskId: String, deadline: TimeStamp):
-    updateTask (owner: User, taskId: String, slack: Slack):
-    updateTask (owner: User, taskId: String, postDependence: Number):
-    updateTask (owner: User, taskId: String, preDependence: Number):
+    updateTask (owner: User, taskId: String, taskName: String)
+    updateTask (owner: User, taskId: String, category: TaskType)
+    updateTask (owner: User, taskId: String, duration: Duration)
+    updateTask (owner: User, taskId: String, priority: Number)
+    updateTask (owner: User, taskId: String, splittable: Flag)
+    updateTask (owner: User, taskId: String, deadline: TimeStamp)
+    updateTask (owner: User, taskId: String, slack: Slack)
+    updateTask (owner: User, taskId: String, postDependence: Number)
+    updateTask (owner: User, taskId: String, preDependence: Number)
         requires:
             exist a task with this taskId and the owner matches the given owner
         effect:
@@ -122,7 +122,7 @@ actions
             if preDependence is changed, also modified the postDependence of related tasks
     
     
-    assignTimeBlock (owner: User, taskId: String, start, end):
+    assignTimeBlock (owner: User, taskId: String, start, end)
         requires:
             exist a task with this taskId and the owner matches the given owner
             under the timeBlock with matching (owner, start, end), taskId doesn't exist in this timeBlock's taskIdSet
@@ -132,7 +132,7 @@ actions
             add the task's taskIds to timeBlockSet under the timeBlock with matching (owner, start, end)
             add this timeBlock's timeBlockId to this task's timeBlockSet
     
-    removeTimeBlock (owner: User, taskId: String, timeBlockId: String):
+    removeTimeBlock (owner: User, taskId: String, timeBlockId: String)
         requires:
             exist a task with this taskId;
             for this task, exists a timeBlockSet that contains the given timeBlockId;
@@ -141,7 +141,7 @@ actions
             remove timeBlockId from the task's timeBlockSet;
             remove the task's taskId from the timeBlock's taskIdSet 
             
-    deleteTask (owner: User, taskId: String):
+    deleteTask (owner: User, taskId: String)
         requires:
             exist a task $t$ with this taskId;
             task $t$ has no postDependence;
@@ -150,3 +150,96 @@ actions
             remove task $t$ from Tasks
             for all timeBlocks containing tasks $t$, remove $t$'s taskId from their taskIdSet
 ```
+
+## RoutineLog
+
+```
+concept RoutineLog [User, Task]
+
+purpose
+    capture what actually happened throughout the day as time-stamped sessions, optionally linked to plans;
+    enable adaptive scheduling and allow users to reflect on their plans;
+
+principle
+    after a user starts and finishes a session, the system records its actual start and end, and can associate it with a planned task
+
+state
+    a set of Sessions with
+        an owner User
+        a sessionName String
+        a sessionId String    \\ this is an unique ID
+        an isPaused Flag
+        a start Time (optional)
+        an end Time (optional)
+        a linkedTask Task (optional)
+        an interruptReason String (optional)
+    
+actions
+    createSession(owner: User, sessionName: String, linkedTask?: Task): (session: Session)
+        effect:
+            generate a unique sessionId
+            create a session owned by owner with sessionName
+            if linkedTask is provided, assign it to this session
+            assign start and end for this session as None
+            assign isPaused as False
+            assign interruptReason as None
+    
+    startSession(owner: User, session: Session)
+        requires:
+            session exists and is owned by owner
+        effect:
+            get the current timestamp
+            set session.start = current time stamp
+    
+    endSession(owner: User, session: Session)
+        requires:
+            session exists and is owned by owner
+        effect:
+            get the current timestamp
+            set session.end = current time stamp
+    
+    pauseSession(owner: User, interruptReason?: String)
+        requires:
+            session exists and is owned by owner
+        effect:
+            get the current timestamp;
+            set session.end = current time stamp;
+            set session.isPaused = True;
+            set session.interruptReason = interruptReason if given;
+```
+
+## AdaptiveSchedule
+```
+concept AdaptiveSchedule [User, Task, TimeBlock]
+
+purpose
+    keeps the schedule responsive by moving, canceling, or creating tasks at future time blocks when reality diverges to ensure that highest priority tasks are achieved first, optimizing productivity
+
+principle
+    when actual sessions overruns or diverges from the plan, the scheduler adjusts subsequent blocks of planned tasks while referencing the tasks' properties like splittable and slack, and respecting priorities, deadlines, and dependence
+
+state
+    a set of AdaptiveBlocks with
+        a timeBlockId String // this is a unique id
+        an owner User
+        a start Time
+        an end Time
+        a taskIdSet containing a set of taskIds
+    
+
+actions
+    addTimeBlock (owner: User, start: Time, end: Time)
+        requires: no adaptive time block exists with this owner, start, and end
+        effect:
+            create a new adaptive time block $b$ with this owner, start, and end;
+            assign $b$ an empty set of tasks;
+    
+    createAdaptiveSchedule (owner: User, taskTable: a set of Tasks, plannedTimeBlocks: a set of TimeBlocks)
+        requires:
+            all time blocks in plannedTimeBlocks has a start that is after the current time
+        effect:
+            referencing information from tasks' attributes (priority, splittable, deadline, slack, preDependence, postDependence) and the current schedule in plannedTimeBlocks, adaptively generate a new schedule by assigning tasks to the corresponding AdaptiveBlock under this owner
+
+```
+
+

@@ -11,6 +11,8 @@
 7. enter total duration, break into # of blocks, drag to calendar
 8. generate priority automatically based on input fields
 9. predependence and post dependence, remember to sync
+10. if linked task, pass task name as sessionname
+11: same session can exist many times
 
 ![alt text](image-1.png)
 ![alt text](image-2.png)
