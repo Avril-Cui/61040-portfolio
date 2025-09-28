@@ -246,4 +246,15 @@ There are three main pages/views in Neo: Today, Compare, and Record. I will go t
 ## View 1: Today
 ![today](as2-ui/today_ui.png)
 
+![today](as2-ui/addtask_ui.png)
+
+
+## View 2: Compare
+![compare](as2-ui/compare_ui.png)
+
+## View 3: Record
+![record](as2-ui/record_ui.png)
+![record_palse_ui](as2-ui/record_palse_ui.png)
+
+
 
