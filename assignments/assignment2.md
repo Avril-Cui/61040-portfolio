@@ -418,7 +418,11 @@ This page is key to Neo. It shows a side-by-side comparison of the planned sched
 
 Instead of punishing users for failing to "stick to the plan" and leave them with no solution for the resulting chaos, Neo reframes deviations as learning opportunities. This page gives visibility into how real life differed from plans. Neo also offers a solution to optimize the schedule. By clicking on the "Optimize Schedule" button, Neo re-adjusts remaining tasks/plans in the day to account for deviations, helping users meeting top priorities and deadlines. Neo helps users update the day dynamically.
 
+#### Simple UI
+![compare](as2-ui/compare-simple.png)
 
+#### Refined UI
+![refined-compare](as2-ui/compare_ui.png)
 
 ## View 3: Record
 ### Start and end session
