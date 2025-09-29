@@ -158,7 +158,7 @@ state
         a taskIdSet set of Strings // contains unique ids
 
 actions
-    getUserSchedule (owner: User): (schedule: set of TimeBlocks)
+    getUserSchedule (owner: User): (timeBlockTable: set of TimeBlocks)
         requires:
             exists at least one time block under this owner
         effect:
@@ -217,6 +217,10 @@ state
         an interruptReason String (optional)
     
 actions
+    getUserSessions (owner: User): (sessionTable: set of Sessions)
+        requires: exist at least one session with this owner
+        effect: return ALL sessions under this owner
+
     createSession(owner: User, sessionName: String, linkedTask?: Task): (session: Session)
         effect:
             generate a unique sessionId
@@ -289,7 +293,7 @@ actions
             create a new adaptive time block $b$ with this owner, start, and end;
             assign $b$ an empty set of tasks;
     
-    createAdaptiveSchedule (owner: User, task: Task, schedule: Schedule, routine: Routine)
+    createAdaptiveSchedule (owner: User, tasks: set of Task, schedule: Schedule, routine: Routine)
         effect:
             based on (task, schedule, and routine), adaptively generate a new schedule of tasks by assigning active tasks to the corresponding AdaptiveBlock under this owner
 
@@ -303,7 +307,7 @@ actions
 5. Pause/interruption of a session
 6. complete a session
 
-### Add and remove task
+### Add task to schedule
 ```
 sync createTask
 
@@ -328,17 +332,18 @@ then
     TaskCatalog.assignSchedule (owner: user, taskId: task.taskId, timeBlockId)
 ```
 
-### Optimize schedule
+### Adaptive scheduling
 ```
 sync optimizeSchedule
 
 when
     Request.optimizeSchedule(user)
     TaskCatalog.getUserTasks(owner: user): (taskTable)
-    ScheduleTime.getUserSchedule(owner: user): (schedule)
+    ScheduleTime.getUserSchedule(owner: user): (timeBlockTable)
+    RoutineLog.getUserSessions(owner: user): (sessionTable)
 
 then
-    AdaptiveSchedule.createAdaptiveSchedule (owner: User, taskTable, plannedTimeBlocks: schedule)
+    AdaptiveSchedule.createAdaptiveSchedule (owner: User, tasks: TaskTable, schedule: timeBlockTable, routine: sessionTable)
 ```
 
 ### Start a session with a planned task
@@ -352,7 +357,6 @@ when
 then
     RoutineLog.startSession (owner: user, session)
 ```
-
 
 ### Start a session with a new task
 ```
@@ -386,7 +390,6 @@ when
 
 then
     RoutineLog.endSession(owner: user, session)
-
 ```
 
 # UI Sketches
