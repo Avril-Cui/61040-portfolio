@@ -387,7 +387,7 @@ then
 ```
 
 # UI Sketches
-There are three main pages/views in Neo: Today, Compare, and Record. I will go through the UI sketch for each, and what purposes each view serves below. To help myself develop a clearer understanding on how my app achieve different features, I first designed a rough sketch of the app's layout. Then, after writing the user's journey (next section), I iterated a second UI version and added more detailed components. Both versions are shown below!
+There are three main pages/views in Neo: Today, Compare, and Record. I will go through the UI sketch for each, and what purposes each view serves below. To help myself develop a clearer understanding on how my app achieve different features and in turn design clearer concepts, I first designed a rough sketch of the app's layout. Then, after writing the user's journey (next section), I iterated a second UI version and added more detailed components. Both versions are shown below!
 
 The simple UI and refined UI have the same components. Refined UI depicts the components in more details, so I annotated these components on refined UI.
 
