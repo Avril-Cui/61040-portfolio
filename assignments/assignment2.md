@@ -60,6 +60,12 @@ concept TaskCatalog [User]
 purpose
     allows users to create tasks with different attributes that will get scheduled;
 
+principle
+    users create tasks with the required attributes;
+    they can update the attributes associated with the tasks;
+    users schedule each task at one or more time blocks;
+    users can delete the tasks they own;
+
 state
     a set of Tasks with
         an owner User
