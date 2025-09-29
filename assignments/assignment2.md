@@ -33,87 +33,86 @@ Users of productivity tools (like myself) often create highly detailed schedules
 
 7. [**RescueTime Solution:**](https://www.rescuetime.com/) This is a tool that monitors focus sessions and daily activities, offering valuable logging of how time is actually spent and enabling users to reflect on their workflow. While it helps raise awareness of tasks achieved during a day and can improve focus quality over time, it does not function as an adaptive scheduler. Users must still rely on additional platforms to re-adjust and optimize their plans, which introduces extra complexity.
 
-# Application pitch: NEO
+# Application pitch: NEO Calendar
 > Introducing NEO $\to$ the ONE calendar app you need
 ## Motivation
-Most productivity tools force people into rigid plans that crumble the moment real life interferes, while students and professionals need not just another static planner, but a dynamic companion that learns, adjusts, and help them grow.
+Most productivity tools force people into rigid plans that crumble the moment real life interferes, while students and professionals need not just another complex and static planner, but a dynamic companion that learns, adjusts, and helps them actually boost productivity.
 
 ## Key features
-Neo tackles the scheduling and productivity problems by making daily planning flexible and adaptive:
-1. **Adaptive routine tracker**: Productivists simply press Start and Finish on tasks. Neo logs actual time spent on the calendar and automatically reorganizes the day when tasks run long or go expected, so priorities and deadlines still get met without punishing Productivists for delays. This features helps Productivists focus on what matters most and reduces stress when the routine shifts.
+Neo is the ONE calendar app you need. Think of it as your digital personal assistant that adjust your daily plans dynamically as your day unfolds. Neo tackles the scheduling and productivity problems by making daily planning flexible and adaptive:
 
-2. **Schedule plans**: Productivists create tasks for future days by specifying key fields like task type, priority, deadlines, estimated duration, and flexibility (i.e., split and move booleans). Neo then translate this into a responsive plan that adjusts smoothly as real life unfolds, respecting constraints while mitigating frustrations caused by last-minute changes. 
+1. **Adaptive routine tracker and planner**: Instead of punishing users (Productivists) when tasks run long or goes unexpectedly, NEO automatically reorganizes the day. By simply pressing Start and Finish, actual time is logged and the schedule adapts in real time so priorities and deadlines are still met. This features helps Productivists focus on what matters the most and reduces stress when the routine shifts.
 
-3. **Smart scheduling suggestions**: drawing from previous schedules and logs on actual activities, Neo identifies time blocks or task types where Productivists are prone to procrastination and flags instances where estimated durations may be unrealistic. Neo then provides evidence-based suggestions for realistic task durations, better focus windows, and time blocks for relax or debrief, empowering users to design plans that work more efficiently in practice.
+2. **Schedule plans**: When creating tasks, Productivists specify essential fields like type, priority, deadlines, and flexibility (e.g., can the task be split or moved?). NEO uses these details to generate a responsive plan that adjusts dynamically and smoothly as unexpected events arise, respecting constraints while mitigating frustrations caused by last-minute changes. 
+
+3. **Smart scheduling suggestions**: Drawing from previous schedules and logs on actual activities, Neo identifies time blocks or task types where Productivists are prone to procrastination and flags instances where estimated durations may be unrealistic. Neo then provides evidence-based suggestions for realistic task durations, better focus windows, and time blocks for relax or debrief, empowering Productivists to design plans that work more efficiently in practice.
 
 # Concept design
 ## TaskCatalog
-TaskCatalog manages all user-defined tasks as structured objects with attributes such as duration, priority, dependencies, slack, and deadlines.  In concepts maintains the modularity of Neo's concept design because other concepts, such as TimeBlockPlan, RoutineLog, or AdaptiveSchedule, can reference the task information without duplicating or controlling it directly. In the broader context of Neo, TaskCatalog ensures that constraints (such as dependencies or deadlines) are respected before a task is assigned to time blocks (either by the user or by the adaptive scheduling algorithm).
+TaskCatalog manages all user-defined tasks as structured objects with attributes such as duration, priority, dependencies, slack, and deadlines.  This concept maintains the modularity of Neo's concept design because other concepts, such as TimeBlockPlan, RoutineLog, or AdaptiveSchedule, can reference the task information without duplicating or controlling it directly. In the broader context of Neo, TaskCatalog ensures that constraints (such as dependencies or deadlines) are respected before a task is assigned to time blocks (either by the user or by the adaptive scheduling algorithm).
 
 The generic type parameters are instantiated as follows:
 - User is bound to the system’s registered end users, each of whom owns and manages their own set of tasks.
-- TaskType represents categories of tasks defined for classification (e.g., Work, Health, Study) and is instantiated in the app where users customize a range of categories.
-- Slack is a buffer type for the tasks, instantiated to model permissible deviation margins (e.g., 15 minutes, 1 hour), which influences how adaptive scheduling adjusts plans.
 
 ```
-concept TaskCatalog [User, TaskType, Slack]
+concept TaskCatalog [User]
 
 purpose
     allows users to create tasks with different attributes that will get scheduled;
-    the attributes will be taken as input by the adaptive calendar algorithm to generate adaptive schedule;
 
 state
     a set of Tasks with
         an owner User
         a taskID String
         a taskName String
-        a category TaskType
+        a category String
         a duration Duration
         a priority Number
         a splittable Flag
         a timeBlockSet containing a set of Strings (optional) // these strings are timeBlockIds
         a deadline TimeStamp (optional)
-        a slack Slack (optional) // buffer margin for acceptable deviation
-        a preDependence containing a set of Tasks (optional) // tasks that it depends on
-        a postDependence containing a set of Tasks (optional) // tasks that depend on it
+        a slack String (optional) // buffer margin for acceptable deviation
+        a preDependence set of Tasks (optional) // tasks that it depends on
+        a postDependence set of Tasks (optional) // tasks that depend on it
         a note String (optional)
 
 actions
-    getUserTasks (owner: User): (taskTable: a set of Tasks)
+    getUserTasks (owner: User): (taskTable: set of Tasks)
         requires: exist at least one task with this owner
         effect: returns ALL tasks under this owner
     
     createTask (
-        owner: User, taskName: String, category: TaskType, duration: Duration,
-        priority: Number, splittable: Flag, deadline?: TimeStamp, slack?: Slack, preDependence?: set of Tasks, note?: String
+        owner: User, taskName: String, category: String, duration: Duration,
+        priority: Number, splittable: Flag, deadline?: TimeStamp, slack?: String, preDependence?: set of Tasks, note?: String
     ): (task: Task)
         effect
             generate a new taskId that has not been used;
             create a new task owned by owner with the attributes (taskId, taskName, category, duration, priority, splittable, deadline?, slack?, preDependence?, note?), the optional attributes are not required;
-            set this task's timeBlockSet as None;
+            set this task's timeBlockSet as an empty set;
             add this newly created task to postDependence of all tasks in its given preDependence;
             return this newly created task;
     
     assignSchedule (owner: User, taskID: String, timeBlockId: string)
         requires:
-            exists task with matching owner and taskId
+            exists a task with matching owner and taskId;
+            timeBlockId does not exist in this task's timeBlockSet;
         effect:
-            add timeBlockId to the set of timeBlockSet
+            add timeBlockId to this task's timeBlockSet
     
     verifyTime (taskId: String, intendedStart: Time, intendedEnd: Time): (verified: Boolean)
         requires:
             exists task with taskId
         effect:
-            returns True if (the latest end time of any preDependence last is before intendedStart) AND (the earliest start time of any postDependence is after intendedEnd);
+            returns True if (the latest end time of any preDependence task is before intendedStart) AND (the earliest start time of any postDependence is after intendedEnd);
             otherwise, return False;
     
     updateTask (owner: User, taskId: String, taskName: String)
-    updateTask (owner: User, taskId: String, category: TaskType)
+    updateTask (owner: User, taskId: String, category: String)
     updateTask (owner: User, taskId: String, duration: Duration)
     updateTask (owner: User, taskId: String, priority: Number)
     updateTask (owner: User, taskId: String, splittable: Flag)
     updateTask (owner: User, taskId: String, deadline: TimeStamp)
-    updateTask (owner: User, taskId: String, slack: Slack)
+    updateTask (owner: User, taskId: String, slack: String)
     updateTask (owner: User, taskId: String, postDependence: Number)
     updateTask (owner: User, taskId: String, preDependence: Number)
     updateTask (owner: User, taskId: String, note: String)
@@ -134,14 +133,14 @@ actions
 ```
 
 ## ScheduleTime
-The ScheduleTime concept manages the user's intended allocation of tasks onto their calendar. I maintained the modularity of Neo's concept design by specifying that TaskCatalog defines the content and attributes of tasks (what needs to be done, with what priority, duration, or constraints), and ScheduleTime manages the tasks' placement in the day (i.e., when they are intended to happen). Tasks remain abstract objects until concretely scheduled into time blocks, and time blocks remain flexible containers that can be reorganized without altering the underlying task definitions.
+The ScheduleTime concept manages the user's intended allocation of tasks onto their calendar. Unlike TaskCatalog, which defines task attributes, ScheduleTime only manages placement into start–end time intervals. Tasks are referenced by their IDs, not by internal details, ensuring that time blocks remain independent containers.
 
-In the broader app architecture, ScheduleTime plays a crucial role in showing users their intended schedule. The Today UI views (from the wireframes) draw directly from ScheduleTime to visualize planned routines. ScheduleTime also enables adaptive scheduling. When deviations occur in the actual routine, the adaptive scheduler updates or reassigns tasks within these time blocks. By modularizing plan scheduling separately from task attributes and adaptive scheduling, the design supports scalability and reduces complexity.
+In the broader app architecture, ScheduleTime plays a crucial role in showing users their intended schedule. The Today UI views (from the wireframes) draw directly from ScheduleTime to visualize planned routines. By modularizing plan scheduling separately from task attributes and adaptive scheduling, the design supports scalability and reduces complexity.
 
-We have a generic parameter User, which is bound to the system’s registered end users, each of whom owns and manages their own set of tasks. We also have a generic parameter TaskId, which are references stored in each time block. TaskId links directly to TaskCatalog, but without duplicating task details.
+There is only one generic parameter User, which is bound to the system’s registered end users, each of whom owns and manages their own set of tasks. 
 
 ```
-concept ScheduleTime [User, TaskId]
+concept ScheduleTime [User]
 
 purpose
     manages users' intended schedule of future tasks by allowing them to assign tasks to each time block
@@ -152,18 +151,18 @@ principle
 
 state
     a set of TimeBlocks with
-    a timeBlockId String // this is a unique id
-    an owner User
-    a start Time
-    an end Time
-    a taskIdSet set of TaskId
+        a timeBlockId String // this is a unique id
+        an owner User
+        a start Time
+        an end Time
+        a taskIdSet set of Strings // contains unique ids
 
 actions
-    getUserSchedule (owner: User): (schedule: a set of TimeBlocks)
+    getUserSchedule (owner: User): (schedule: set of TimeBlocks)
         requires:
             exists at least one time block under this owner
         effect:
-            return a set of all time blocks under this owner ending before day's end
+            return a set of all time blocks under this owner ending before the day's end
         
     addTimeBlock (owner: User, start: Time, end: Time)
         requires:
@@ -171,15 +170,15 @@ actions
         effect:
             create a new time block $b$ with this owner, start, and end, and empty taskIdSet
     
-    assignTimeBlock (owner: User, taskId: TaskId, start: Time, end: Time): (timeBlockId: String)
+    assignTimeBlock (owner: User, taskId: String, start: Time, end: Time): (timeBlockId: String)
         requires:
             if exists time block b with matching (owner, start, end), then timeId is not in b.taskIdSet
         effect:
-            if b doesn't exist, create it with owner, start, and end (same as addTimeBlock)
+            if b doesn't exist, create it with owner, start, and end (same as addTimeBlock);
             add taskId to b.taskIdSet;
             return b.timeBlockId;
     
-    removeTask (owner: User, taskId: TaskId, timeBlockId: String)
+    removeTask (owner: User, taskId: String, timeBlockId: String)
         requires:
             exists a time block with matching owner and timeBlockId;
             taskId exists in this time block's taskIdSet;
@@ -189,23 +188,21 @@ actions
 ```
 
 ## RoutineLog
-The RoutineLog concept captures the reality of what a user actually does during the day, complementing the planned schedules stored in TaskCatalog and ScheduleTime. Each session records start and end timestamps, optional links to planned tasks, and metadata such as pause flags or interruption reasons. This concept ensures that the system has an accurate log of the user’s real activity, which is critical both for the user to reflect on the daily routine (via Compare views) and for feeding the adaptive scheduling algorithm.
-
-In the overall app, RoutineLog logs the actual routine against which intended schedules can be compared. AdaptiveSchedule uses this data to adjust future allocations when tasks run long or get interrupted. Insight features also depend on RoutineLog to identify patterns, such as frequent pauses or underestimated durations. By modularizing the capture of actual sessions, RoutineLog cleanly separates the recording of reality from both planning (ScheduleTime/TaskCatalog) and adaptation (AdaptiveSchedule), ensuring independence and clarity across the system’s design.
+RoutineLog captures what actually happens in real time as timestamped sessions. Sessions may optionally link back to tasks defined in TaskCatalog but are otherwise independent records of user activity. This concept enables reflection (users can compare planned vs. actual) and provides input for AdaptiveSchedule. RoutineLog’s independence ensures that recording actual activity is modular and does not interfere with task definitions or planned schedules.
 
 The generic parameters are instantiated as follows:
 - User is bound to the system’s registered end users, each of whom owns and manages their own set of tasks
-- Task refers to task objects managed by TaskCatalog; when linked, a session provides evidence of whether the task was completed as intended. When no task is linked, RoutineLog will support ad-hoc or unscheduled work.
+- Task refers to task objects managed by TaskCatalog; when linked, a session provides evidence of whether the task was completed as intended. When no task is linked, RoutineLog will support ad-hoc or unscheduled work. The task type is generic here because the concept makes no assumption about its internal structure, other than linking it to a session.
 
 ```
 concept RoutineLog [User, Task]
 
 purpose
-    capture what actually happened throughout the day as time-stamped sessions, optionally linked to plans;
-    enable adaptive scheduling and allow users to reflect on their plans;
+    capture what actually happened throughout the day as time-stamped sessions, optionally linked to planned tasks;
+    allow users to reflect on their plans by comparing with logged sessions;
 
 principle
-    after a user starts and finishes a session, the system records its actual start and end, and can associate it with a planned task
+    after a user starts and finishes a session, the system records its actual duration and possible reasons of interruption
 
 state
     a set of Sessions with
@@ -213,6 +210,7 @@ state
         a sessionName String
         a sessionId String    \\ this is an unique ID
         an isPaused Flag
+        an isActive Flag
         a start Time (optional)
         an end Time (optional)
         a linkedTask Task (optional)
@@ -225,53 +223,55 @@ actions
             create a session owned by owner with sessionName
             if linkedTask is provided, assign it to this session
             assign start and end for this session as None
-            assign isPaused as False
+            assign isPaused as False and isActive as False
             assign interruptReason as None
+            return this newly created session
     
     startSession(owner: User, session: Session)
         requires:
-            session exists and is owned by owner
+            session exists and is owned by owner and has isActive as False
         effect:
             get the current timestamp
             set session.start = current time stamp
+            set session.isActive as True
     
     endSession(owner: User, session: Session)
         requires:
-            session exists and is owned by owner
+            session exists and is owned by owner and has isActive as True
         effect:
             get the current timestamp
             set session.end = current time stamp
+            set session.isActive as False
     
     pauseSession(owner: User, session: Session, interruptReason: String)
         requires:
-            session exists and is owned by owner
+            session exists and is owned by owner and has isActive as True
         effect:
             get the current timestamp;
             set session.end = current time stamp;
             set session.isPaused = True;
             set session.interruptReason = interruptReason;
-    
 ```
 
 ## AdaptiveSchedule
-The AdaptiveSchedule concept is responsible for keeping the user’s plan responsive when reality diverges from intention. Whereas TaskCatalog and ScheduleTime represent the static plan, and RoutineLog records what actually happened, AdaptiveSchedule bridges the two by generating updated schedules whenever tasks run long, are interrupted, or priorities shift. It ensures that deadlines, priorities, dependencies, and slack tolerances are respected while still optimizing for what can realistically be accomplished.
-
-Within the context of the app, AdaptiveSchedule plays the role of a dynamic optimizer: when invoked (i.e., when the user clicking "Optimize Schedule" in the UI), it computes a new allocation of tasks to AdaptiveBlocks. These AdaptiveBlocks serve as a modified plan that can be written back into ScheduleTime. This design maintains modularity: AdaptiveSchedule never edits task definitions, changes planned schedule, or logs sessions, but instead produces an updated schedule that follows the rules defined elsewhere.
+AdaptiveSchedule ensures that the user’s schedule remains realistic when plans diverge from reality. It consumes generic inputs like tasks, schedule, and routine, and produces new adaptive blocks without altering those original concepts. AdaptiveSchedule maintains independence while optimizing schedules. It functions as a separate, adaptive layer that responds dynamically to RoutineLog and updates plans accordingly.
 
 The generic parameters are instantiated as follows:
 - User is bound to the system’s registered end users, each of whom owns and manages their own set of tasks
-- Task refers to task objects stored in TaskCatalog, each with the attributes (priority, splittable, deadline, slack, dependencies) that the adaptive algorithm evaluates
-- TimeBlock refers to planned blocks from ScheduleTime that provides information on the planned schedule
+- Task will be instantiated when users create task objects stored in TaskCatalog
+- Schedule will be instantiated when users create schedules of tasks stored in ScheduleTime
+- Routine will be instantiated when users logs sessions stored in RoutineLog
 
+All of these external types are completely generic, and AdaptiveSchedule makes no assumption about their internal structure.
 
 ```
-concept AdaptiveSchedule [User, Task, TimeBlock]
+concept AdaptiveSchedule [User, Task, Schedule, Routine]
 
 purpose
-    keeps the schedule responsive by moving, canceling, or creating tasks at future time blocks when reality diverges to ensure that highest priority tasks are achieved first, optimizing productivity
+    keeps the schedule responsive by moving, canceling, or creating tasks scheduled at future time blocks when reality diverges to ensure that highest priority tasks are achieved first, optimizing productivity
 
 principle
-    when actual sessions overruns or diverges from the plan, the scheduler adjusts subsequent blocks of planned tasks while referencing the tasks' properties like splittable and slack, and respecting priorities, deadlines, and dependence
+    when actual sessions overruns or diverges from the plan, the scheduler adjusts subsequent planned tasks
 
 state
     a set of AdaptiveBlocks with
@@ -279,21 +279,20 @@ state
         an owner User
         a start Time
         an end Time
-        a taskIdSet containing a set of taskIds
-    
+        a taskIdSet set of Strings // contains unique ids
 
 actions
     addTimeBlock (owner: User, start: Time, end: Time)
-        requires: no adaptive time block exists with this owner, start, and end
+        requires:
+            no adaptive time block exists with this owner, start, and end
         effect:
             create a new adaptive time block $b$ with this owner, start, and end;
             assign $b$ an empty set of tasks;
     
-    createAdaptiveSchedule (owner: User, taskTable: a set of Tasks, plannedTimeBlocks: a set of TimeBlocks)
-        requires:
-            all time blocks in plannedTimeBlocks has a start that is after the current time
+    createAdaptiveSchedule (owner: User, task: Task, schedule: Schedule, routine: Routine)
         effect:
-            referencing information from tasks' attributes (priority, splittable, deadline, slack, preDependence, postDependence) and the current schedule in plannedTimeBlocks, adaptively generate a new schedule by assigning active tasks to the corresponding AdaptiveBlock under this owner
+            based on (task, schedule, and routine), adaptively generate a new schedule of tasks by assigning active tasks to the corresponding AdaptiveBlock under this owner
+
 ```
 
 ## Synchronizations
