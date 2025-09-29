@@ -393,18 +393,29 @@ then
 ```
 
 # UI Sketches
-There are three main pages/views in Neo: Today, Compare, and Record. I will go through the UI sketch for each, and what purposes each view serves below. Each of the UI design is annotated with pointers, and more detailed explanation are provided below the UI.
+There are three main pages/views in Neo: Today, Compare, and Record. I will go through the UI sketch for each, and what purposes each view serves below. To help myself develop a clearer understanding on how my app achieve different features, I first designed a rough sketch of the app's layout. Then, after writing the user's journey (next section), I iterated a second UI version and added more detailed components. Both versions are shown below!
+
+The simple UI and refined UI have the same components. Refined UI depicts the components in more details, so I annotated these components on refined UI.
+
 ## View 1: Today
 ### Show today's schedule
 This page displays a clean timeline of the user's schedule for the current day, showing tasks' schedule and progress. The key component is a timeline with tasks stacked along time slots. Each task shows priority and progress bar.
 
 This simply visualization of the daily schedule shows clear indicators of progress and priority, reducing decision fatigue.
 
+#### Simple UI
+![today](as2-ui/today-simple.png)
+
+#### Refined UI
 ![today](as2-ui/today_ui.png)
 
 ### Add task
 The add task panel allows users to create planned tasks by entering essential information (task name, category, duration, priority, and optional settings like deadline, buffer/slack, prerequisites, and postrequisites). These information will help the algorithm to produce more optimized adaptive schedule.
 
+#### Simple UI
+![today](as2-ui/add-simple.png)
+
+#### Refined UI
 ![today](as2-ui/addtask_ui.png)
 
 
@@ -413,6 +424,10 @@ This page is key to Neo. It shows a side-by-side comparison of the planned sched
 
 Instead of punishing users for failing to "stick to the plan" and leave them with no solution for the resulting chaos, Neo reframes deviations as learning opportunities. This page gives visibility into how real life differed from plans. Neo also offers a solution to optimize the schedule. By clicking on the "Optimize Schedule" button, Neo re-adjusts remaining tasks/plans in the day to account for deviations, helping users meeting top priorities and deadlines. Neo helps users update the day dynamically.
 
+#### Simple UI
+![compare](as2-ui/compare-simple.png)
+
+#### Refined UI
 ![compare](as2-ui/compare_ui.png)
 
 ## View 3: Record
@@ -421,6 +436,10 @@ In the Record page, the user logs current work session in real time. The page wi
 
 The goal of this page is to make it easy to record real-time sessions, reducing the friction in logging actual routines, and provide data for adaptive scheduling.
 
+#### Simple UI
+![record](as2-ui/timer-simple.png)
+
+#### Refined UI
 ![record](as2-ui/record_ui.png)
 
 ### Pause session
