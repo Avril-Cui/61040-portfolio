@@ -300,12 +300,6 @@ actions
 ```
 
 ## Synchronizations
-1. Add new task
-2. Optimize schedule
-3. Start a session with a planned block
-4. Start a session with a new task
-5. Pause/interruption of a session
-6. complete a session
 
 ### Add task to schedule
 ```
