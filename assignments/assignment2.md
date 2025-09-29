@@ -422,7 +422,7 @@ Instead of punishing users for failing to "stick to the plan" and leave them wit
 ![compare](as2-ui/compare-simple.png)
 
 #### Refined UI
-![compare](as2-ui/compare_ui.png)
+![refined-compare](as2-ui/compare_ui.png)
 
 ## View 3: Record
 ### Start and end session
