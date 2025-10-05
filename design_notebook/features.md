@@ -12,7 +12,8 @@
 8. generate priority automatically based on input fields
 9. predependence and post dependence, remember to sync
 10. if linked task, pass task name as sessionname
-11: same session can exist many times
+11. same session can exist many times
+12. add more detailed edit page for ai generated outcomes
 
 ![alt text](image-1.png)
 ![alt text](image-2.png)
